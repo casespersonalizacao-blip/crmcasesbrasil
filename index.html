@@ -571,10 +571,62 @@
         .print-option input[type="radio"] {
             margin-right: 10px;
         }
+        /* LOGIN SCREEN */
+        #login-screen { position:fixed;top:0;left:0;right:0;bottom:0;background:#1a1d2e;display:flex;align-items:center;justify-content:center;z-index:9999; }
+        .login-box { background:#fff;border-radius:16px;padding:40px;width:380px;box-shadow:0 20px 60px rgba(0,0,0,0.4); }
+        .login-logo { text-align:center;margin-bottom:28px; }
+        .login-logo .ico { font-size:44px; }
+        .login-logo h2 { color:#1a1d2e;font-size:22px;font-weight:800;margin:6px 0 0; }
+        .login-logo p { color:#888;font-size:13px;margin:4px 0 0; }
+        .login-field { margin-bottom:16px; }
+        .login-field label { display:block;font-size:13px;font-weight:600;color:#333;margin-bottom:6px; }
+        .login-field input { width:100%;padding:11px 14px;border:1.5px solid #ddd;border-radius:8px;font-size:14px;outline:none;transition:border-color .2s; }
+        .login-field input:focus { border-color:#FF9800; }
+        .login-btn { width:100%;background:#FF9800;color:#fff;border:none;padding:13px;border-radius:8px;font-size:15px;font-weight:700;cursor:pointer;transition:background .2s; }
+        .login-btn:hover { background:#e68900; }
+        #login-error { display:none;background:#ffebee;color:#c62828;padding:10px 14px;border-radius:8px;font-size:13px;margin-bottom:16px; }
+        /* SIDEBAR USER */
+        .sidebar-user { margin-top:20px;padding-top:16px;border-top:1px solid #2e3247; }
+        .sidebar-user .su-name { font-size:14px;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis; }
+        .sidebar-user .su-loja { font-size:11px;color:#FF9800;margin:2px 0 2px; }
+        .sidebar-user .su-role { font-size:11px;color:#aaa;margin-bottom:10px; }
+        .logout-btn { width:100%;background:#2e3247;color:#aaa;border:none;padding:8px 12px;border-radius:6px;cursor:pointer;font-size:12px;text-align:left;transition:background .2s; }
+        .logout-btn:hover { background:#FF9800;color:#fff; }
+        /* CARDS GRID */
+        .cards-grid { display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;margin-top:4px; }
+        .data-card { background:#fff;border-radius:12px;padding:18px;box-shadow:0 2px 8px rgba(0,0,0,.08);transition:box-shadow .2s; }
+        .data-card:hover { box-shadow:0 4px 16px rgba(0,0,0,.13); }
+        .data-card-title { font-size:15px;font-weight:800;color:#1a1d2e; }
+        .data-card-sub { font-size:12px;color:#888;margin-top:1px; }
+        .data-card-info { font-size:12px;line-height:1.8;color:#555;margin-top:10px; }
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
-    <div class="container">
+    <!-- TELA DE LOGIN -->
+    <div id="login-screen">
+        <div class="login-box">
+            <div class="login-logo">
+                <div class="ico">📦</div>
+                <h2>Cases Brasil</h2>
+                <p>CRM Interno</p>
+            </div>
+            <div id="login-error"></div>
+            <div class="login-field">
+                <label>E-mail</label>
+                <input type="email" id="login-email" placeholder="seu@email.com"
+                    onkeydown="if(event.key==='Enter')document.getElementById('login-senha').focus()">
+            </div>
+            <div class="login-field">
+                <label>Senha</label>
+                <input type="password" id="login-senha" placeholder="••••••••"
+                    onkeydown="if(event.key==='Enter')fazerLogin()">
+            </div>
+            <button class="login-btn" onclick="fazerLogin()">Entrar</button>
+        </div>
+    </div>
+
+    <div class="container" id="app-container" style="display:none">
         <div class="sidebar">
             <h2>📦 Cases Brasil</h2>
             <ul>
@@ -585,8 +637,14 @@
                 <li><a href="#" onclick="showSection('garantia_tela')" class="sidebar-link">📱 Garantia de Tela</a></li>
                 <li><a href="#" onclick="showSection('producao_loja')" class="sidebar-link">🏪 Produção Loja</a></li>
                 <li><a href="#" onclick="showSection('clientes')" class="sidebar-link">👥 Clientes</a></li>
-                <li><a href="#" onclick="showSection('lojas')" class="sidebar-link">🏬 Lojas</a></li>
+                <li id="menu-lojas"><a href="#" onclick="showSection('lojas')" class="sidebar-link">🏬 Lojas</a></li>
             </ul>
+            <div class="sidebar-user" id="sidebar-user" style="display:none">
+                <div class="su-name" id="su-nome"></div>
+                <div class="su-loja" id="su-loja"></div>
+                <div class="su-role" id="su-role"></div>
+                <button class="logout-btn" onclick="fazerLogout()">🚪 Sair</button>
+            </div>
         </div>
 
         <div class="main">
@@ -691,38 +749,21 @@
                 <!-- CLIENTES SECTION -->
                 <div id="clientes" class="section">
                     <div class="button-group">
+                        <input type="text" id="clientes-search" placeholder="🔍 Buscar cliente..."
+                            oninput="renderClientes()"
+                            style="padding:8px 14px;border:1.5px solid #ddd;border-radius:6px;font-size:14px;width:260px;outline:none"
+                            onfocus="this.style.borderColor='#FF9800'" onblur="this.style.borderColor='#ddd'">
                         <button class="btn" onclick="openModal('novo-cliente-form')">➕ Novo Cliente</button>
                     </div>
-                    <table id="clientes-table">
-                        <thead>
-                            <tr>
-                                <th>Nome</th>
-                                <th>Email</th>
-                                <th>Telefone</th>
-                                <th>Loja</th>
-                                <th>Ações</th>
-                            </tr>
-                        </thead>
-                        <tbody id="clientes-tbody"></tbody>
-                    </table>
+                    <div id="clientes-grid" class="cards-grid"></div>
                 </div>
 
                 <!-- LOJAS SECTION -->
                 <div id="lojas" class="section">
                     <div class="button-group">
-                        <button class="btn" onclick="openModal('nova-loja-form')">➕ Nova Loja</button>
+                        <button class="btn" id="btn-nova-loja" onclick="openModal('nova-loja-form')">➕ Nova Loja</button>
                     </div>
-                    <table id="lojas-table">
-                        <thead>
-                            <tr>
-                                <th>Nome</th>
-                                <th>Cidade</th>
-                                <th>Contato</th>
-                                <th>Ações</th>
-                            </tr>
-                        </thead>
-                        <tbody id="lojas-tbody"></tbody>
-                    </table>
+                    <div id="lojas-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:16px"></div>
                 </div>
             </div>
         </div>
@@ -1131,31 +1172,32 @@
         </div>
     </div>
 
-    <!-- MODAL: Novo Cliente -->
+    <!-- MODAL: Novo/Editar Cliente -->
     <div id="novo-cliente-form" style="display:none;">
         <div class="modal-header">
-            <h2>Novo Cliente</h2>
+            <h2 id="cliente-form-titulo">Novo Cliente</h2>
             <button class="modal-close" onclick="closeModal()">×</button>
         </div>
         <div class="modal-body">
             <form onsubmit="salvarCliente(event)">
+                <input type="hidden" id="cliente-edit-id">
                 <div class="form-group">
-                    <label>Nome</label>
+                    <label>Nome *</label>
                     <input type="text" id="cliente-nome" required>
                 </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+                    <div class="form-group">
+                        <label>WhatsApp</label>
+                        <input type="text" id="cliente-whatsapp" placeholder="(48) 99999-9999">
+                    </div>
+                    <div class="form-group">
+                        <label>CPF</label>
+                        <input type="text" id="cliente-cpf" placeholder="000.000.000-00">
+                    </div>
+                </div>
                 <div class="form-group">
-                    <label>Email</label>
+                    <label>E-mail</label>
                     <input type="email" id="cliente-email">
-                </div>
-                <div class="form-group">
-                    <label>Telefone</label>
-                    <input type="text" id="cliente-telefone">
-                </div>
-                <div class="form-group">
-                    <label>Loja</label>
-                    <select id="cliente-loja">
-                        <option value="">Selecione...</option>
-                    </select>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancelar</button>
@@ -1165,25 +1207,46 @@
         </div>
     </div>
 
-    <!-- MODAL: Nova Loja -->
+    <!-- MODAL: Nova/Editar Loja -->
     <div id="nova-loja-form" style="display:none;">
         <div class="modal-header">
-            <h2>Nova Loja</h2>
+            <h2 id="loja-form-titulo">Nova Loja</h2>
             <button class="modal-close" onclick="closeModal()">×</button>
         </div>
         <div class="modal-body">
             <form onsubmit="salvarLoja(event)">
+                <input type="hidden" id="loja-edit-id">
                 <div class="form-group">
-                    <label>Nome</label>
-                    <input type="text" id="loja-nome" required>
+                    <label>Nome Fantasia *</label>
+                    <input type="text" id="loja-nome-fantasia" required>
                 </div>
                 <div class="form-group">
-                    <label>Cidade</label>
-                    <input type="text" id="loja-cidade" required>
+                    <label>Razão Social</label>
+                    <input type="text" id="loja-razao-social">
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+                    <div class="form-group">
+                        <label>CNPJ</label>
+                        <input type="text" id="loja-cnpj" placeholder="00.000.000/0000-00">
+                    </div>
+                    <div class="form-group">
+                        <label>Telefone</label>
+                        <input type="text" id="loja-telefone" placeholder="(48) 99999-9999">
+                    </div>
                 </div>
                 <div class="form-group">
-                    <label>Contato</label>
-                    <input type="text" id="loja-contato">
+                    <label>Endereço</label>
+                    <input type="text" id="loja-endereco" placeholder="Rua, número, bairro">
+                </div>
+                <div style="display:grid;grid-template-columns:2fr 1fr;gap:12px">
+                    <div class="form-group">
+                        <label>Cidade</label>
+                        <input type="text" id="loja-cidade">
+                    </div>
+                    <div class="form-group">
+                        <label>Estado</label>
+                        <input type="text" id="loja-estado" placeholder="SC" maxlength="2">
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancelar</button>
@@ -1215,7 +1278,99 @@
     </div>
 
     <script>
+        // =====================================================================
+        // SUPABASE + AUTH
+        // =====================================================================
+        const SUPABASE_URL = 'https://plxnjsiaggxdhtovimzv.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBseG5qc2lhZ2d4ZGh0b3ZpbXp2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY5MzUyODQsImV4cCI6MjA5MjUxMTI4NH0.qFbLc2wwyMYTsDXOHY4wWNjm4Md6ZZsyIh4yduWt9bA';
+        const _sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        let currentSession = null; // { id, nome, email, loja_id, funcao }
+        let lojasCache    = [];
+        let clientesCache = [];
+
+        async function sha256(text) {
+            const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
+            return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
+        }
+
+        async function fazerLogin() {
+            const email = (document.getElementById('login-email').value || '').trim();
+            const senha = document.getElementById('login-senha').value || '';
+            const errEl = document.getElementById('login-error');
+            errEl.style.display = 'none';
+            if (!email || !senha) {
+                errEl.textContent = 'Preencha e-mail e senha.';
+                errEl.style.display = 'block';
+                return;
+            }
+            const senhaHash = await sha256(senha);
+            const { data, error } = await _sb
+                .from('funcionarios')
+                .select('*')
+                .eq('email', email)
+                .eq('senha', senhaHash)
+                .eq('ativo', true)
+                .maybeSingle();
+            if (error || !data) {
+                errEl.textContent = 'E-mail ou senha incorretos.';
+                errEl.style.display = 'block';
+                return;
+            }
+            currentSession = { id: data.id, nome: data.nome, email: data.email, loja_id: data.loja_id, funcao: data.funcao };
+            localStorage.setItem('cbcrm_session', JSON.stringify(currentSession));
+            await iniciarApp();
+        }
+
+        async function fazerLogout() {
+            localStorage.removeItem('cbcrm_session');
+            currentSession = null;
+            document.getElementById('app-container').style.display = 'none';
+            document.getElementById('login-screen').style.display = 'flex';
+            document.getElementById('login-email').value = '';
+            document.getElementById('login-senha').value = '';
+            document.getElementById('login-error').style.display = 'none';
+        }
+
+        async function carregarLojasCache() {
+            const { data } = await _sb.from('lojas').select('*').order('nome_fantasia');
+            lojasCache = data || [];
+        }
+
+        async function carregarClientesCache() {
+            const { data } = await _sb.from('clientes').select('*').order('nome');
+            clientesCache = data || [];
+        }
+
+        async function iniciarApp() {
+            await Promise.all([carregarLojasCache(), carregarClientesCache()]);
+
+            // Sidebar user info
+            const su = document.getElementById('sidebar-user');
+            if (su && currentSession) {
+                su.style.display = 'block';
+                document.getElementById('su-nome').textContent = currentSession.nome;
+                const loja = lojasCache.find(l => l.id === currentSession.loja_id);
+                document.getElementById('su-loja').textContent = loja ? loja.nome_fantasia : 'Gerência Geral';
+                const roleMap = { gerente: '👑 Gerente', vendedor: '💼 Vendedor', caixa: '💰 Caixa' };
+                document.getElementById('su-role').textContent = roleMap[currentSession.funcao] || currentSession.funcao;
+                // Ocultar menu Lojas para não-gerentes
+                if (currentSession.funcao !== 'gerente') {
+                    const menuLojas = document.getElementById('menu-lojas');
+                    if (menuLojas) menuLojas.style.display = 'none';
+                }
+            }
+
+            document.getElementById('login-screen').style.display = 'none';
+            document.getElementById('app-container').style.display = 'flex';
+
+            initData();
+            renderDashboard();
+        }
+
+        // =====================================================================
         // UTILITÁRIOS
+        // =====================================================================
         function ts() {
             return new Date().toISOString();
         }
@@ -1276,119 +1431,25 @@
         let gtPdfBase64 = null;
         let printContent = '';
 
-        // INITIALIZE DATA
+        // INITIALIZE DATA (lojas e clientes agora vêm do Supabase)
         function initData() {
-            if (!localStorage.getItem('cbcrm_lojas')) {
-                saveStorage('cbcrm_lojas', lojas.map((l, i) => ({
-                    id: uid(),
-                    nome: l.split(' (')[0],
-                    cidade: l.split(' (')[1].slice(0, -1),
-                    contato: '(48) 999-' + (1000 + i)
-                })));
-            }
 
-            if (!localStorage.getItem('cbcrm_clientes')) {
-                saveStorage('cbcrm_clientes', clientes.map((c, i) => ({
-                    id: uid(),
-                    nome: c,
-                    email: c.toLowerCase().replace(/ /g, '.') + '@email.com',
-                    telefone: '(48) 9999-' + String(1000 + i),
-                    loja_id: loadStorage('cbcrm_lojas')[i % loadStorage('cbcrm_lojas').length].id
-                })));
-            }
-
+            // Dados de demonstração para módulos ainda em localStorage
+            // cliente_id e loja_id ficam vazios até migração completa
             if (!localStorage.getItem('cbcrm_capas')) {
-                saveStorage('cbcrm_capas', [
-                    {
-                        id: uid(),
-                        cliente_id: loadStorage('cbcrm_clientes')[0].id,
-                        loja_id: loadStorage('cbcrm_lojas')[0].id,
-                        itens: [{ produto:'Capa Personalizada', modelo:'iPhone 15 Pro', cod_estampa:'EST-001', nome:'Ana', observacao:'Fundo azul', qtd:2, valor_unit:89.90, subtotal:179.80, imagem:'' }],
-                        valor: 179.80,
-                        pago: 'nao_pago',
-                        stage: 'produzir',
-                        data: ts(),
-                        log: [{ msg:'🖨️ Pedido criado — Produzir', loja:'', color:'#2196F3', ts: ts() }]
-                    },
-                    {
-                        id: uid(),
-                        cliente_id: loadStorage('cbcrm_clientes')[1].id,
-                        loja_id: loadStorage('cbcrm_lojas')[1].id,
-                        itens: [
-                            { produto:'Capa Personalizada', modelo:'Samsung A14', cod_estampa:'EST-002', nome:'', observacao:'', qtd:1, valor_unit:79.90, subtotal:79.90, imagem:'' },
-                            { produto:'Copo Térmico', modelo:'500ml', cod_estampa:'', nome:'Bruno', observacao:'Gravação laser', qtd:1, valor_unit:120.00, subtotal:120.00, imagem:'' }
-                        ],
-                        valor: 199.90,
-                        pago: 'pago_parcial',
-                        valor_pago: 100,
-                        valor_retirada: 99.90,
-                        stage: 'ag_aprovacao',
-                        data: ts(),
-                        log: [{ msg:'🖨️ Pedido criado — Produzir', loja:'', color:'#2196F3', ts: ts() }]
-                    }
-                ]);
+                saveStorage('cbcrm_capas', []);
             }
-
             if (!localStorage.getItem('cbcrm_assistencia')) {
-                saveStorage('cbcrm_assistencia', [
-                    {
-                        id: uid(),
-                        cliente_id: loadStorage('cbcrm_clientes')[0].id,
-                        loja_id: loadStorage('cbcrm_lojas')[0].id,
-                        descricao: 'Troca de vidro traseiro',
-                        valor: 150,
-                        fotos: [],
-                        data: ts(),
-                        status: 'aberto'
-                    }
-                ]);
+                saveStorage('cbcrm_assistencia', []);
             }
-
             if (!localStorage.getItem('cbcrm_garantia_produto')) {
-                const stages = ['solicitado', 'recebido', 'analise', 'aprovado', 'reprovado', 'encerrado'];
-                saveStorage('cbcrm_garantia_produto', [
-                    {
-                        id: uid(),
-                        cliente_id: loadStorage('cbcrm_clientes')[0].id,
-                        loja_id: loadStorage('cbcrm_lojas')[0].id,
-                        produto: 'Capa Case Personalizada',
-                        descricao: 'Vazamento de tinta',
-                        stage: stages[0],
-                        num_garantia: 'GP-' + Date.now(),
-                        data: ts()
-                    }
-                ]);
+                saveStorage('cbcrm_garantia_produto', []);
             }
-
             if (!localStorage.getItem('cbcrm_garantia_tela')) {
-                saveStorage('cbcrm_garantia_tela', [
-                    {
-                        id: uid(),
-                        cliente_id: loadStorage('cbcrm_clientes')[1].id,
-                        loja_id: loadStorage('cbcrm_lojas')[1].id,
-                        modelo: 'iPhone 13',
-                        fotos: [],
-                        pdf: null,
-                        data: ts(),
-                        status: 'pendente'
-                    }
-                ]);
+                saveStorage('cbcrm_garantia_tela', []);
             }
-
             if (!localStorage.getItem('cbcrm_producao_loja')) {
-                const stages = ['solicitado', 'confirmado', 'em_producao', 'pronto', 'entregue'];
-                saveStorage('cbcrm_producao_loja', [
-                    {
-                        id: uid(),
-                        loja_id: loadStorage('cbcrm_lojas')[0].id,
-                        data_criacao: ts(),
-                        stage: stages[0],
-                        modelos: [
-                            { id: uid(), modelo: 'iPhone 15 Pro Max', qtd_feminina: 10, qtd_masculina: 15, obs: 'Rosa claro' },
-                            { id: uid(), modelo: 'Samsung A14', qtd_feminina: 20, qtd_masculina: 10, obs: 'Preto' }
-                        ]
-                    }
-                ]);
+                saveStorage('cbcrm_producao_loja', []);
             }
         }
 
@@ -1399,7 +1460,20 @@
                 document.getElementById('modal-content').innerHTML = content.innerHTML;
                 document.getElementById('modal-overlay').classList.add('active');
 
-                if (formId.includes('cliente')) populateSelect('cliente-loja');
+                // Reset campos de edição ao abrir novo
+                if (formId === 'nova-loja-form') {
+                    const el = document.getElementById('loja-form-titulo');
+                    if (el) el.textContent = 'Nova Loja';
+                    const eid = document.getElementById('loja-edit-id');
+                    if (eid) eid.value = '';
+                }
+                if (formId === 'novo-cliente-form') {
+                    const el = document.getElementById('cliente-form-titulo');
+                    if (el) el.textContent = 'Novo Cliente';
+                    const eid = document.getElementById('cliente-edit-id');
+                    if (eid) eid.value = '';
+                }
+                // cliente-loja removido — clientes não têm mais vínculo com loja
                 if (formId.includes('lote')) populateSelect('lote-loja');
                 if (formId.includes('capa') && !formId.includes('detalhe')) {
                     populateSelect('capa-loja');
@@ -1450,23 +1524,31 @@
             if (!select) return;
 
             if (selectId.includes('cliente')) {
-                const clientesList = loadStorage('cbcrm_clientes');
+                const list = clientesCache.length > 0 ? clientesCache : loadStorage('cbcrm_clientes');
                 select.innerHTML = '<option value="">Selecione...</option>' +
-                    clientesList.map(c => `<option value="${c.id}">${c.nome}</option>`).join('');
+                    list.map(c => `<option value="${c.id}">${c.nome}</option>`).join('');
             }
 
             if (selectId.includes('loja')) {
-                const lojasList = loadStorage('cbcrm_lojas');
+                const list = lojasCache.length > 0 ? lojasCache : loadStorage('cbcrm_lojas');
                 select.innerHTML = '<option value="">Selecione...</option>' +
-                    lojasList.map(l => `<option value="${l.id}">${l.nome} (${l.cidade})</option>`).join('');
+                    list.map(l => {
+                        const nome = l.nome_fantasia || l.nome || '';
+                        const cidade = l.cidade ? ` (${l.cidade})` : '';
+                        return `<option value="${l.id}">${nome}${cidade}</option>`;
+                    }).join('');
             }
         }
 
         function getClienteNome(id) {
-            return loadStorage('cbcrm_clientes').find(c => c.id === id)?.nome || 'Desconhecido';
+            return clientesCache.find(c => c.id === id)?.nome
+                || loadStorage('cbcrm_clientes').find(c => c.id === id)?.nome
+                || 'Desconhecido';
         }
 
         function getLojaNome(id) {
+            const sc = lojasCache.find(l => l.id === id);
+            if (sc) return sc.nome_fantasia || sc.nome || 'Desconhecida';
             return loadStorage('cbcrm_lojas').find(l => l.id === id)?.nome || 'Desconhecida';
         }
 
@@ -1484,7 +1566,7 @@
         // ---- Cliente inline search ----
         function buscarClientesCapa(q) {
             const dd = document.getElementById('capa-cliente-dropdown');
-            const clientes = loadStorage('cbcrm_clientes');
+            const clientes = clientesCache.length > 0 ? clientesCache : loadStorage('cbcrm_clientes');
             const filtrados = q.length > 0
                 ? clientes.filter(c => c.nome.toLowerCase().includes(q.toLowerCase()))
                 : clientes;
@@ -1515,22 +1597,24 @@
             const f = document.getElementById('novo-cliente-capa-form');
             f.style.display = f.style.display === 'none' ? 'block' : 'none';
         }
-        function salvarNovoClienteCapa() {
-            const nome = document.getElementById('nc-nome').value.trim();
-            const tel  = document.getElementById('nc-telefone').value.trim();
-            const cpf  = document.getElementById('nc-cpf').value.trim();
-            const email= document.getElementById('nc-email').value.trim();
-            const cep  = document.getElementById('nc-cep').value.trim();
-            const end  = document.getElementById('nc-endereco').value.trim();
-            if (!nome||!tel||!cpf||!email||!cep||!end) { alert('Preencha todos os campos obrigatórios do cliente.'); return; }
-            const cliente = { id: uid(), nome, telefone: tel, cpf, email, cep, endereco: end };
-            const clientes = loadStorage('cbcrm_clientes');
-            clientes.push(cliente);
-            saveStorage('cbcrm_clientes', clientes);
-            selecionarClienteCapa(cliente.id, cliente.nome);
+        async function salvarNovoClienteCapa() {
+            const nome    = document.getElementById('nc-nome').value.trim();
+            const tel     = document.getElementById('nc-telefone').value.trim();
+            const cpf     = document.getElementById('nc-cpf').value.trim();
+            const email   = document.getElementById('nc-email').value.trim();
+            if (!nome||!tel) { alert('Preencha pelo menos nome e telefone.'); return; }
+            const { data, error } = await _sb.from('clientes')
+                .insert([{ nome, whatsapp: tel, cpf, email }])
+                .select().maybeSingle();
+            if (error) { alert('Erro ao salvar cliente: ' + error.message); return; }
+            if (data) {
+                clientesCache.push(data);
+                selecionarClienteCapa(data.id, data.nome);
+            }
             document.getElementById('novo-cliente-capa-form').style.display = 'none';
-            ['nc-nome','nc-telefone','nc-cpf','nc-email','nc-cep','nc-endereco'].forEach(id => document.getElementById(id).value = '');
-            renderClientes();
+            ['nc-nome','nc-telefone','nc-cpf','nc-email','nc-cep','nc-endereco'].forEach(id => {
+                const el = document.getElementById(id); if (el) el.value = '';
+            });
         }
 
         // ---- Pagamento parcial ----
@@ -1950,7 +2034,11 @@
         ];
 
         function renderCapas() {
-            const capas = loadStorage('cbcrm_capas');
+            let capas = loadStorage('cbcrm_capas');
+            // Controle de acesso: não-gerentes veem somente a sua loja
+            if (currentSession && currentSession.funcao !== 'gerente' && currentSession.loja_id) {
+                capas = capas.filter(c => c.loja_id === currentSession.loja_id);
+            }
             let html = '<div class="kanban-board">';
             CAPA_STAGES.forEach(st => {
                 const stageCaps = capas.filter(c => c.stage === st.id);
@@ -2681,98 +2769,283 @@
             }
         }
 
-        // CLIENTES
-        function salvarCliente(event) {
+        // =====================================================================
+        // CLIENTES (Supabase)
+        // =====================================================================
+        async function salvarCliente(event) {
             event.preventDefault();
-            const cliente = {
-                id: uid(),
-                nome: document.getElementById('cliente-nome').value,
-                email: document.getElementById('cliente-email').value,
-                telefone: document.getElementById('cliente-telefone').value,
-                loja_id: document.getElementById('cliente-loja').value || ''
+            const editId = document.getElementById('cliente-edit-id')?.value || '';
+            const payload = {
+                nome:      document.getElementById('cliente-nome').value.trim(),
+                whatsapp:  document.getElementById('cliente-whatsapp').value.trim(),
+                email:     document.getElementById('cliente-email').value.trim(),
+                cpf:       document.getElementById('cliente-cpf').value.trim(),
             };
-
-            const clientes = loadStorage('cbcrm_clientes');
-            clientes.push(cliente);
-            saveStorage('cbcrm_clientes', clientes);
-            closeModal();
+            let error;
+            if (editId) {
+                ({ error } = await _sb.from('clientes').update(payload).eq('id', editId));
+            } else {
+                ({ error } = await _sb.from('clientes').insert([payload]));
+            }
+            if (error) { alert('Erro ao salvar cliente: ' + error.message); return; }
+            _fecharModal();
+            await carregarClientesCache();
             renderClientes();
         }
 
-        function renderClientes() {
-            const clientes = loadStorage('cbcrm_clientes');
-            const tbody = document.getElementById('clientes-tbody');
-            tbody.innerHTML = clientes.map(c => `
-                <tr>
-                    <td>${c.nome}</td>
-                    <td>${c.email}</td>
-                    <td>${c.telefone}</td>
-                    <td>${c.loja_id ? getLojaNome(c.loja_id) : '-'}</td>
-                    <td>
-                        <div class="action-buttons">
-                            <button class="icon-btn" onclick="deletarClienteById('${c.id}')" style="color: #f44336;">🗑️</button>
+        async function renderClientes() {
+            const grid = document.getElementById('clientes-grid');
+            if (!grid) return;
+            if (clientesCache.length === 0) await carregarClientesCache();
+            const q = (document.getElementById('clientes-search')?.value || '').toLowerCase();
+            const lista = q ? clientesCache.filter(c =>
+                (c.nome||'').toLowerCase().includes(q) ||
+                (c.email||'').toLowerCase().includes(q) ||
+                (c.whatsapp||'').includes(q) ||
+                (c.cpf||'').includes(q)
+            ) : clientesCache;
+
+            if (lista.length === 0) {
+                grid.innerHTML = '<div class="empty-state">👥 Nenhum cliente encontrado</div>';
+                return;
+            }
+            grid.innerHTML = lista.map(c => `
+                <div class="data-card" style="border-top:3px solid #FF9800">
+                    <div style="display:flex;justify-content:space-between;align-items:flex-start">
+                        <div>
+                            <div class="data-card-title">${c.nome}</div>
+                            ${c.cpf ? `<div class="data-card-sub">CPF: ${c.cpf}</div>` : ''}
                         </div>
-                    </td>
-                </tr>
+                        <div style="display:flex;gap:5px">
+                            <button onclick="editarCliente('${c.id}')" title="Editar"
+                                style="background:#1a1d2e;color:#fff;border:none;border-radius:5px;padding:4px 8px;cursor:pointer;font-size:11px">✏️</button>
+                            <button onclick="deletarClienteById('${c.id}')"
+                                style="background:#f44336;color:#fff;border:none;border-radius:5px;padding:4px 8px;cursor:pointer;font-size:11px">🗑️</button>
+                        </div>
+                    </div>
+                    <div class="data-card-info">
+                        ${c.whatsapp ? `<div>📱 <a href="https://wa.me/55${c.whatsapp.replace(/\D/g,'')}" target="_blank" style="color:#25D366;font-weight:600;text-decoration:none">${c.whatsapp}</a></div>` : ''}
+                        ${c.email ? `<div>✉️ ${c.email}</div>` : ''}
+                    </div>
+                </div>
             `).join('');
         }
 
-        function deletarClienteById(id) {
-            if (confirm('Tem certeza que deseja deletar este cliente?')) {
-                let clientes = loadStorage('cbcrm_clientes');
-                clientes = clientes.filter(c => c.id !== id);
-                saveStorage('cbcrm_clientes', clientes);
-                renderClientes();
-            }
+        function editarCliente(id) {
+            const c = clientesCache.find(x => x.id === id);
+            if (!c) return;
+            openModal('novo-cliente-form');
+            document.getElementById('cliente-form-titulo').textContent = 'Editar Cliente';
+            document.getElementById('cliente-edit-id').value = id;
+            document.getElementById('cliente-nome').value    = c.nome || '';
+            document.getElementById('cliente-whatsapp').value = c.whatsapp || '';
+            document.getElementById('cliente-email').value  = c.email || '';
+            document.getElementById('cliente-cpf').value    = c.cpf || '';
         }
 
-        // LOJAS
-        function salvarLoja(event) {
-            event.preventDefault();
-            const loja = {
-                id: uid(),
-                nome: document.getElementById('loja-nome').value,
-                cidade: document.getElementById('loja-cidade').value,
-                contato: document.getElementById('loja-contato').value
-            };
+        async function deletarClienteById(id) {
+            if (!confirm('Tem certeza que deseja deletar este cliente?')) return;
+            const { error } = await _sb.from('clientes').delete().eq('id', id);
+            if (error) { alert('Erro ao deletar: ' + error.message); return; }
+            clientesCache = clientesCache.filter(c => c.id !== id);
+            renderClientes();
+        }
 
-            const lojas = loadStorage('cbcrm_lojas');
-            lojas.push(loja);
-            saveStorage('cbcrm_lojas', lojas);
-            closeModal();
+        // =====================================================================
+        // LOJAS (Supabase)
+        // =====================================================================
+        async function salvarLoja(event) {
+            event.preventDefault();
+            const editId = document.getElementById('loja-edit-id')?.value || '';
+            const payload = {
+                nome_fantasia: document.getElementById('loja-nome-fantasia').value.trim(),
+                razao_social:  document.getElementById('loja-razao-social').value.trim(),
+                cnpj:          document.getElementById('loja-cnpj').value.trim(),
+                telefone:      document.getElementById('loja-telefone').value.trim(),
+                endereco:      document.getElementById('loja-endereco').value.trim(),
+                cidade:        document.getElementById('loja-cidade').value.trim(),
+                estado:        document.getElementById('loja-estado').value.trim().toUpperCase(),
+            };
+            let error;
+            if (editId) {
+                ({ error } = await _sb.from('lojas').update(payload).eq('id', editId));
+            } else {
+                ({ error } = await _sb.from('lojas').insert([payload]));
+            }
+            if (error) { alert('Erro ao salvar loja: ' + error.message); return; }
+            _fecharModal();
+            await carregarLojasCache();
             renderLojas();
         }
 
-        function renderLojas() {
-            const lojas = loadStorage('cbcrm_lojas');
-            const tbody = document.getElementById('lojas-tbody');
-            tbody.innerHTML = lojas.map(l => `
-                <tr>
-                    <td>${l.nome}</td>
-                    <td>${l.cidade}</td>
-                    <td>${l.contato}</td>
-                    <td>
-                        <div class="action-buttons">
-                            <button class="icon-btn" onclick="deletarLojaById('${l.id}')" style="color: #f44336;">🗑️</button>
+        async function renderLojas() {
+            const grid = document.getElementById('lojas-grid');
+            if (!grid) return;
+            await carregarLojasCache();
+            if (lojasCache.length === 0) {
+                grid.innerHTML = '<div class="empty-state">🏬 Nenhuma loja cadastrada</div>';
+                return;
+            }
+            grid.innerHTML = lojasCache.map(l => `
+                <div class="data-card" style="border-left:4px solid #FF9800">
+                    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px">
+                        <div>
+                            <div class="data-card-title">${l.nome_fantasia}</div>
+                            ${l.razao_social ? `<div class="data-card-sub">${l.razao_social}</div>` : ''}
                         </div>
-                    </td>
-                </tr>
+                        <div style="display:flex;gap:5px;flex-shrink:0;margin-left:8px">
+                            <button onclick="abrirEquipeLoja('${l.id}')"
+                                style="background:#FF9800;color:#fff;border:none;border-radius:5px;padding:5px 9px;cursor:pointer;font-size:11px;font-weight:700">👥 Equipe</button>
+                            <button onclick="editarLoja('${l.id}')"
+                                style="background:#1a1d2e;color:#fff;border:none;border-radius:5px;padding:5px 9px;cursor:pointer;font-size:11px">✏️</button>
+                            <button onclick="deletarLojaById('${l.id}')"
+                                style="background:#f44336;color:#fff;border:none;border-radius:5px;padding:5px 9px;cursor:pointer;font-size:11px">🗑️</button>
+                        </div>
+                    </div>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:12px;color:#555">
+                        ${l.cnpj     ? `<div>🪪 <b>CNPJ:</b> ${l.cnpj}</div>` : ''}
+                        ${l.telefone ? `<div>📞 <b>Tel:</b> ${l.telefone}</div>` : ''}
+                        ${l.cidade   ? `<div>📍 ${l.cidade}${l.estado?'/'+l.estado:''}</div>` : ''}
+                        ${l.endereco ? `<div style="grid-column:span 2">🏠 ${l.endereco}</div>` : ''}
+                    </div>
+                </div>
             `).join('');
         }
 
-        function deletarLojaById(id) {
-            if (confirm('Tem certeza que deseja deletar esta loja?')) {
-                let lojas = loadStorage('cbcrm_lojas');
-                lojas = lojas.filter(l => l.id !== id);
-                saveStorage('cbcrm_lojas', lojas);
-                renderLojas();
-            }
+        function editarLoja(id) {
+            const l = lojasCache.find(x => x.id === id);
+            if (!l) return;
+            openModal('nova-loja-form');
+            document.getElementById('loja-form-titulo').textContent  = 'Editar Loja';
+            document.getElementById('loja-edit-id').value            = id;
+            document.getElementById('loja-nome-fantasia').value      = l.nome_fantasia || '';
+            document.getElementById('loja-razao-social').value       = l.razao_social || '';
+            document.getElementById('loja-cnpj').value               = l.cnpj || '';
+            document.getElementById('loja-telefone').value           = l.telefone || '';
+            document.getElementById('loja-endereco').value           = l.endereco || '';
+            document.getElementById('loja-cidade').value             = l.cidade || '';
+            document.getElementById('loja-estado').value             = l.estado || '';
+        }
+
+        async function deletarLojaById(id) {
+            if (!confirm('Tem certeza que deseja deletar esta loja?')) return;
+            const { error } = await _sb.from('lojas').delete().eq('id', id);
+            if (error) { alert('Erro ao deletar: ' + error.message); return; }
+            lojasCache = lojasCache.filter(l => l.id !== id);
+            renderLojas();
+        }
+
+        // =====================================================================
+        // FUNCIONÁRIOS (gestão dentro da loja)
+        // =====================================================================
+        async function abrirEquipeLoja(lojaId) {
+            const loja = lojasCache.find(l => l.id === lojaId);
+            if (!loja) return;
+            const { data: funcs } = await _sb.from('funcionarios').select('*').eq('loja_id', lojaId).order('nome');
+            const lista = funcs || [];
+            const roleColor = { gerente:'#FF9800', vendedor:'#2196F3', caixa:'#4CAF50' };
+            const html = `
+            <div>
+                <div class="modal-header">
+                    <h2>👥 ${loja.nome_fantasia} — Equipe</h2>
+                    <button class="modal-close" onclick="_fecharModal()">×</button>
+                </div>
+                <div class="modal-body">
+                    <div style="display:flex;justify-content:flex-end;margin-bottom:14px">
+                        <button class="btn btn-small" onclick="document.getElementById('form-novo-func').style.display='block';this.style.display='none'">➕ Novo Funcionário</button>
+                    </div>
+                    <!-- Formulário novo funcionário -->
+                    <div id="form-novo-func" style="display:none;background:#f8f9fa;border-radius:8px;padding:16px;margin-bottom:16px">
+                        <h4 style="margin-bottom:12px;color:#1a1d2e">Novo Funcionário</h4>
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+                            <div class="form-group"><label>Nome</label><input type="text" id="func-nome" placeholder="Nome completo"></div>
+                            <div class="form-group"><label>E-mail</label><input type="email" id="func-email" placeholder="email@exemplo.com"></div>
+                            <div class="form-group"><label>Senha</label><input type="password" id="func-senha" placeholder="Senha de acesso"></div>
+                            <div class="form-group"><label>Função</label>
+                                <select id="func-funcao">
+                                    <option value="vendedor">Vendedor</option>
+                                    <option value="caixa">Caixa</option>
+                                    <option value="gerente">Gerente</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:6px">
+                            <button class="btn btn-secondary btn-small" onclick="document.getElementById('form-novo-func').style.display='none'">Cancelar</button>
+                            <button class="btn btn-small" onclick="salvarFuncionario('${lojaId}')">Salvar</button>
+                        </div>
+                    </div>
+                    <!-- Lista de funcionários -->
+                    <div id="func-lista">
+                    ${lista.length === 0
+                        ? '<div class="empty-state" style="padding:20px">Nenhum funcionário cadastrado</div>'
+                        : lista.map(f => `
+                            <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:#f8f9fa;border-radius:8px;margin-bottom:8px;border-left:3px solid ${roleColor[f.funcao]||'#ddd'}">
+                                <div>
+                                    <div style="font-weight:700;font-size:14px">${f.nome}</div>
+                                    <div style="font-size:12px;color:#666">${f.email}</div>
+                                    <div style="margin-top:3px;display:flex;gap:6px;align-items:center">
+                                        <span style="background:${roleColor[f.funcao]||'#607D8B'};color:#fff;padding:1px 8px;border-radius:10px;font-size:10px;font-weight:700">${f.funcao}</span>
+                                        <span style="font-size:10px;color:${f.ativo?'#4CAF50':'#f44336'};font-weight:600">${f.ativo?'● Ativo':'● Inativo'}</span>
+                                    </div>
+                                </div>
+                                <div style="display:flex;gap:5px;flex-shrink:0">
+                                    <button onclick="toggleFuncionario('${f.id}','${lojaId}',${f.ativo})"
+                                        style="background:${f.ativo?'#607D8B':'#4CAF50'};color:#fff;border:none;border-radius:4px;padding:4px 8px;cursor:pointer;font-size:11px">${f.ativo?'Desativar':'Ativar'}</button>
+                                    <button onclick="resetarSenha('${f.id}','${lojaId}')"
+                                        style="background:#FF9800;color:#fff;border:none;border-radius:4px;padding:4px 8px;cursor:pointer;font-size:11px">🔑</button>
+                                    <button onclick="deletarFuncionario('${f.id}','${lojaId}')"
+                                        style="background:#f44336;color:#fff;border:none;border-radius:4px;padding:4px 8px;cursor:pointer;font-size:11px">🗑️</button>
+                                </div>
+                            </div>`).join('')}
+                    </div>
+                </div>
+            </div>`;
+            document.getElementById('modal-content').innerHTML = html;
+            document.getElementById('modal-overlay').classList.add('active');
+        }
+
+        async function salvarFuncionario(lojaId) {
+            const nome   = (document.getElementById('func-nome')?.value||'').trim();
+            const email  = (document.getElementById('func-email')?.value||'').trim();
+            const senha  = document.getElementById('func-senha')?.value||'';
+            const funcao = document.getElementById('func-funcao')?.value||'vendedor';
+            if (!nome||!email||!senha) { alert('Preencha todos os campos.'); return; }
+            const senhaHash = await sha256(senha);
+            const { error } = await _sb.from('funcionarios').insert([{ nome, email, senha: senhaHash, loja_id: lojaId, funcao }]);
+            if (error) { alert('Erro: ' + error.message); return; }
+            await abrirEquipeLoja(lojaId);
+        }
+
+        async function toggleFuncionario(funcId, lojaId, ativo) {
+            await _sb.from('funcionarios').update({ ativo: !ativo }).eq('id', funcId);
+            await abrirEquipeLoja(lojaId);
+        }
+
+        async function resetarSenha(funcId, lojaId) {
+            const nova = prompt('Nova senha para este funcionário:');
+            if (!nova) return;
+            const hash = await sha256(nova);
+            const { error } = await _sb.from('funcionarios').update({ senha: hash }).eq('id', funcId);
+            if (error) { alert('Erro: ' + error.message); return; }
+            alert('Senha atualizada!');
+        }
+
+        async function deletarFuncionario(funcId, lojaId) {
+            if (!confirm('Deletar este funcionário?')) return;
+            await _sb.from('funcionarios').delete().eq('id', funcId);
+            await abrirEquipeLoja(lojaId);
         }
 
         // NAVEGAÇÃO
         function showSection(sectionId) {
-            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-            document.getElementById(sectionId).classList.add('active');
+            // Força o hide de todas as seções, incluindo as com display inline (ex: capas com flex)
+            document.querySelectorAll('.section').forEach(s => {
+                s.classList.remove('active');
+                s.style.display = 'none';
+            });
+            const el = document.getElementById(sectionId);
+            el.classList.add('active');
+            el.style.display = sectionId === 'capas' ? 'flex' : 'block';
 
             document.querySelectorAll('.sidebar-link').forEach(a => a.classList.remove('active'));
             event.target.classList.add('active');
@@ -2798,6 +3071,11 @@
             if (sectionId === 'producao_loja') renderProducaoLoja();
             if (sectionId === 'clientes') renderClientes();
             if (sectionId === 'lojas') renderLojas();
+            // Reset form titulo on modal opens
+            if (sectionId === 'clientes') {
+                const el = document.getElementById('cliente-form-titulo');
+                if (el) el.textContent = 'Novo Cliente';
+            }
             if (sectionId === 'dashboard') renderDashboard();
         }
 
@@ -3059,10 +3337,24 @@
             closeModal();
         }
 
-        // INIT
-        window.addEventListener('load', () => {
-            initData();
-            renderDashboard();
+        // INIT — verifica sessão salva ou mostra login
+        window.addEventListener('load', async () => {
+            const saved = localStorage.getItem('cbcrm_session');
+            if (saved) {
+                try {
+                    currentSession = JSON.parse(saved);
+                    // Valida se funcionário ainda está ativo
+                    const { data } = await _sb.from('funcionarios')
+                        .select('ativo').eq('id', currentSession.id).maybeSingle();
+                    if (data && data.ativo) {
+                        await iniciarApp();
+                        return;
+                    }
+                } catch(e) {}
+                localStorage.removeItem('cbcrm_session');
+            }
+            // Sem sessão válida — mostra tela de login
+            document.getElementById('login-screen').style.display = 'flex';
         });
     </script>
 </body>
