@@ -609,16 +609,16 @@
             <div class="login-logo">
                 <div class="ico">📦</div>
                 <h2>Cases Brasil</h2>
-                <p>CRM Interno</p>
+                <p style="color:#888;font-size:13px;margin-top:4px">Acesso por Loja</p>
             </div>
             <div id="login-error"></div>
             <div class="login-field">
-                <label>E-mail</label>
-                <input type="email" id="login-email" placeholder="seu@email.com"
+                <label>E-mail da Loja</label>
+                <input type="email" id="login-email" placeholder="loja@email.com"
                     onkeydown="if(event.key==='Enter')document.getElementById('login-senha').focus()">
             </div>
             <div class="login-field">
-                <label>Senha</label>
+                <label>Senha da Loja</label>
                 <input type="password" id="login-senha" placeholder="••••••••"
                     onkeydown="if(event.key==='Enter')fazerLogin()">
             </div>
@@ -642,7 +642,6 @@
             <div class="sidebar-user" id="sidebar-user" style="display:none">
                 <div class="su-name" id="su-nome"></div>
                 <div class="su-loja" id="su-loja"></div>
-                <div class="su-role" id="su-role"></div>
                 <button class="logout-btn" onclick="fazerLogout()">🚪 Sair</button>
             </div>
         </div>
@@ -689,61 +688,69 @@
                 </div>
 
                 <!-- ASSISTÊNCIA TÉCNICA SECTION -->
-                <div id="assistencia" class="section">
-                    <div class="button-group">
+                <div id="assistencia" class="section" style="display:flex;flex-direction:column;height:100%">
+                    <div class="button-group" style="flex-shrink:0">
                         <button class="btn" onclick="openModal('nova-assistencia-form')">➕ Nova OS</button>
+                        <input type="text" id="assistencia-busca" placeholder="🔍 Buscar por cliente ou nº OS..."
+                            oninput="renderAssistencia()"
+                            style="padding:8px 14px;border:1.5px solid #ddd;border-radius:6px;font-size:13px;width:260px;outline:none"
+                            onfocus="this.style.borderColor='#FF9800'" onblur="this.style.borderColor='#ddd'">
                     </div>
-                    <table id="assistencia-table">
-                        <thead>
-                            <tr>
-                                <th>OS</th>
-                                <th>Cliente</th>
-                                <th>Loja</th>
-                                <th>Descrição</th>
-                                <th>Valor</th>
-                                <th>Status</th>
-                                <th>Ações</th>
-                            </tr>
-                        </thead>
-                        <tbody id="assistencia-tbody"></tbody>
-                    </table>
+                    <div id="assistencia-kanban" style="flex:1;overflow:hidden"></div>
                 </div>
 
                 <!-- GARANTIA DE PRODUTOS SECTION -->
-                <div id="garantia_produto" class="section">
-                    <div class="button-group">
+                <div id="garantia_produto" class="section" style="display:flex;flex-direction:column;height:100%">
+                    <div class="button-group" style="flex-shrink:0">
                         <button class="btn" onclick="openModal('nova-garantia-produto-form')">➕ Nova Solicitação</button>
+                        <input type="text" id="garantia-produto-busca" placeholder="🔍 Buscar por cliente ou nº garantia..."
+                            oninput="renderGarantiaProduto()"
+                            style="padding:8px 14px;border:1.5px solid #ddd;border-radius:6px;font-size:13px;width:260px;outline:none"
+                            onfocus="this.style.borderColor='#FF9800'" onblur="this.style.borderColor='#ddd'">
                     </div>
-                    <div class="kanban" id="garantia-produto-kanban"></div>
+                    <div id="garantia-produto-kanban" style="flex:1;overflow:hidden"></div>
                 </div>
 
                 <!-- GARANTIA DE TELA SECTION -->
                 <div id="garantia_tela" class="section">
                     <div class="button-group">
-                        <button class="btn" onclick="openModal('nova-garantia-tela-form')">➕ Nova Solicitação</button>
+                        <button class="btn" onclick="openModal('nova-garantia-tela-form')">➕ Nova Garantia</button>
+                        <input type="text" id="garantia-tela-busca" placeholder="🔍 Buscar por cliente ou modelo..."
+                            oninput="renderGarantiaTela()"
+                            style="padding:8px 14px;border:1.5px solid #ddd;border-radius:6px;font-size:13px;width:260px;outline:none"
+                            onfocus="this.style.borderColor='#FF9800'" onblur="this.style.borderColor='#ddd'">
+                        <div style="display:flex;gap:8px;align-items:center;margin-left:8px;font-size:12px">
+                            <span style="background:#4CAF50;color:#fff;padding:2px 10px;border-radius:10px">● Válida</span>
+                            <span style="background:#FF9800;color:#fff;padding:2px 10px;border-radius:10px">● Vence em 30d</span>
+                            <span style="background:#f44336;color:#fff;padding:2px 10px;border-radius:10px">● Vencida</span>
+                        </div>
                     </div>
-                    <table id="garantia-tela-table">
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Cliente</th>
-                                <th>Loja</th>
-                                <th>Modelo</th>
-                                <th>Data</th>
-                                <th>Status</th>
-                                <th>Ações</th>
-                            </tr>
-                        </thead>
-                        <tbody id="garantia-tela-tbody"></tbody>
-                    </table>
+                    <div id="garantia-tela-grid" class="cards-grid"></div>
                 </div>
 
                 <!-- PRODUÇÃO LOJA SECTION -->
-                <div id="producao_loja" class="section">
-                    <div class="button-group">
-                        <button class="btn" onclick="openModal('novo-lote-form')">➕ Novo Lote</button>
+                <div id="producao_loja" class="section" style="display:flex;flex-direction:column;height:100%">
+                    <div style="flex-shrink:0">
+                        <div class="button-group">
+                            <button class="btn" onclick="abrirNovoLote('transparente')">➕ Novo Pedido — Transparentes</button>
+                            <button class="btn" style="background:#9C27B0" onclick="abrirNovoLote('personalizada')">➕ Novo Pedido — Personalizadas</button>
+                            <input type="text" id="producao-busca" placeholder="🔍 Buscar pedido..."
+                                oninput="renderProducaoLoja()"
+                                style="padding:8px 14px;border:1.5px solid #ddd;border-radius:6px;font-size:13px;width:220px;outline:none"
+                                onfocus="this.style.borderColor='#9C27B0'" onblur="this.style.borderColor='#ddd'">
+                        </div>
+                        <div style="display:flex;gap:0;margin-bottom:0;border-bottom:2px solid #eee">
+                            <button id="tab-transparente" onclick="trocarTabProducao('transparente')"
+                                style="padding:10px 22px;background:#FF9800;color:#fff;border:none;border-radius:6px 6px 0 0;cursor:pointer;font-weight:700;font-size:13px">
+                                🔲 Capas Transparentes
+                            </button>
+                            <button id="tab-personalizada" onclick="trocarTabProducao('personalizada')"
+                                style="padding:10px 22px;background:#eee;color:#666;border:none;border-radius:6px 6px 0 0;cursor:pointer;font-weight:700;font-size:13px;margin-left:4px">
+                                🎨 Capas Personalizadas
+                            </button>
+                        </div>
                     </div>
-                    <div class="kanban" id="producao-loja-kanban"></div>
+                    <div id="producao-loja-kanban" style="flex:1;overflow:hidden"></div>
                 </div>
 
                 <!-- CLIENTES SECTION -->
@@ -957,45 +964,83 @@
         </div>
     </div>
 
-    <!-- MODAL: Nova Assistência Técnica -->
+    <!-- MODAL: Nova OS Assistência Técnica -->
     <div id="nova-assistencia-form" style="display:none;">
         <div class="modal-header">
-            <h2>Nova OS Assistência Técnica</h2>
+            <h2 id="assist-modal-titulo">🔧 Nova OS — Assistência Técnica</h2>
             <button class="modal-close" onclick="closeModal()">×</button>
         </div>
         <div class="modal-body">
             <form onsubmit="salvarAssistencia(event)">
+                <input type="hidden" id="assist-edit-id" value="">
                 <div class="form-group">
-                    <label>Cliente</label>
-                    <select id="assist-cliente" required>
-                        <option value="">Selecione...</option>
-                    </select>
+                    <label>Cliente *</label>
+                    <div style="position:relative">
+                        <input type="text" id="assist-cliente-search" placeholder="Digite o nome do cliente..." autocomplete="off"
+                            oninput="buscarClientesAssist(this.value)" onfocus="buscarClientesAssist(this.value)"
+                            style="width:100%;padding:10px;border:1px solid #ddd;border-radius:4px;font-size:14px">
+                        <input type="hidden" id="assist-cliente-id">
+                        <div id="assist-cliente-dropdown" style="display:none;position:absolute;top:100%;left:0;right:0;background:#fff;border:1px solid #ddd;border-radius:0 0 4px 4px;max-height:150px;overflow-y:auto;z-index:100;box-shadow:0 4px 8px rgba(0,0,0,.1)"></div>
+                    </div>
+                    <div id="novo-cliente-assist-inline"></div>
                 </div>
                 <div class="form-group">
-                    <label>Loja</label>
+                    <label>Loja *</label>
                     <select id="assist-loja" required>
                         <option value="">Selecione...</option>
                     </select>
                 </div>
-                <div class="form-group">
-                    <label>Descrição do Problema</label>
-                    <textarea id="assist-descricao" required></textarea>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+                    <div class="form-group">
+                        <label>Marca / Modelo do Aparelho *</label>
+                        <input type="text" id="assist-modelo" placeholder="Ex: iPhone 15 Pro" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Cor</label>
+                        <input type="text" id="assist-cor" placeholder="Ex: Preto">
+                    </div>
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+                    <div class="form-group">
+                        <label>IMEI</label>
+                        <input type="text" id="assist-imei" placeholder="(opcional)">
+                    </div>
+                    <div class="form-group">
+                        <label>Senha do Aparelho</label>
+                        <input type="text" id="assist-senha-aparelho" placeholder="****">
+                    </div>
                 </div>
                 <div class="form-group">
-                    <label>Fotos do Problema</label>
+                    <label>Problema Relatado pelo Cliente *</label>
+                    <textarea id="assist-descricao" required placeholder="Descreva o que o cliente relatou..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Condições Externas do Aparelho</label>
+                    <textarea id="assist-condicoes" placeholder="Arranhões, trincas, amassados, etc."></textarea>
+                </div>
+                <div class="form-group">
+                    <label>📷 Fotos de Entrada do Aparelho</label>
                     <div class="file-input-wrapper">
-                        <label class="file-label" onclick="document.getElementById('assist-fotos').click()">Clique ou arraste fotos aqui</label>
+                        <label class="file-label" onclick="document.getElementById('assist-fotos').click()">Adicionar fotos</label>
                         <input type="file" id="assist-fotos" accept="image/*" multiple onchange="handleAssistFotos(event)">
                     </div>
                     <div class="gallery" id="assist-gallery"></div>
                 </div>
-                <div class="form-group">
-                    <label>Valor Total do Serviço</label>
-                    <input type="number" id="assist-valor" step="0.01" required>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+                    <div class="form-group">
+                        <label>Prazo Estimado de Entrega</label>
+                        <input type="date" id="assist-prazo">
+                    </div>
+                    <div class="form-group">
+                        <label>👤 Responsável</label>
+                        <select id="assist-responsavel">
+                            <option value="">Selecionar responsável...</option>
+                        </select>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancelar</button>
-                    <button type="submit" class="btn">Salvar</button>
+                    <button type="submit" class="btn">Abrir OS</button>
                 </div>
             </form>
         </div>
@@ -1009,6 +1054,7 @@
         </div>
         <div class="modal-body" id="detalhe-assistencia-body"></div>
         <div class="modal-footer">
+            <button class="btn" style="background:#FF9800" onclick="editarAssistencia(currentDetailId)">✏️ Editar</button>
             <button class="btn" onclick="abrirImpressao('assistencia')">🖨️ Imprimir</button>
             <button type="button" class="btn btn-danger" onclick="deletarAssistencia()">Deletar</button>
             <button type="button" class="btn btn-secondary" onclick="closeModal()">Fechar</button>
@@ -1018,30 +1064,79 @@
     <!-- MODAL: Nova Garantia Produto -->
     <div id="nova-garantia-produto-form" style="display:none;">
         <div class="modal-header">
-            <h2>Nova Solicitação de Garantia de Produto</h2>
+            <h2 id="gp-modal-titulo">✅ Nova Garantia de Produto</h2>
             <button class="modal-close" onclick="closeModal()">×</button>
         </div>
         <div class="modal-body">
             <form onsubmit="salvarGarantiaProduto(event)">
+                <input type="hidden" id="gp-edit-id" value="">
                 <div class="form-group">
-                    <label>Cliente</label>
-                    <select id="gp-cliente" required>
-                        <option value="">Selecione...</option>
-                    </select>
+                    <label>Cliente *</label>
+                    <div style="position:relative">
+                        <input type="text" id="gp-cliente-search" placeholder="Digite o nome do cliente..." autocomplete="off"
+                            oninput="buscarClientesGP(this.value)" onfocus="buscarClientesGP(this.value)"
+                            style="width:100%;padding:10px;border:1px solid #ddd;border-radius:4px;font-size:14px">
+                        <input type="hidden" id="gp-cliente-id">
+                        <div id="gp-cliente-dropdown" style="display:none;position:absolute;top:100%;left:0;right:0;background:#fff;border:1px solid #ddd;border-radius:0 0 4px 4px;max-height:150px;overflow-y:auto;z-index:100;box-shadow:0 4px 8px rgba(0,0,0,.1)"></div>
+                    </div>
+                    <div id="novo-cliente-gp-inline"></div>
                 </div>
                 <div class="form-group">
-                    <label>Loja</label>
+                    <label>Loja *</label>
                     <select id="gp-loja" required>
                         <option value="">Selecione...</option>
                     </select>
                 </div>
-                <div class="form-group">
-                    <label>Produto</label>
-                    <input type="text" id="gp-produto" required>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+                    <div class="form-group">
+                        <label>Produto *</label>
+                        <input type="text" id="gp-produto" required placeholder="Ex: Tela iPhone 14 Pro">
+                    </div>
+                    <div class="form-group">
+                        <label style="display:flex;align-items:center;gap:6px">Código do Produto
+                            <span style="background:#f44336;color:#fff;font-size:10px;padding:1px 6px;border-radius:10px;font-weight:800">OBRIGATÓRIO</span>
+                        </label>
+                        <input type="text" id="gp-codigo" required placeholder="Ex: TL-APL-14P-BK">
+                    </div>
                 </div>
                 <div class="form-group">
-                    <label>Descrição do Problema</label>
-                    <textarea id="gp-descricao" required></textarea>
+                    <label>Descrição do Problema *</label>
+                    <textarea id="gp-descricao" required placeholder="Descreva o defeito apresentado..."></textarea>
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+                    <div class="form-group">
+                        <label>Nº OS da Assistência</label>
+                        <input type="text" id="gp-os-numero" placeholder="Ex: 076306">
+                    </div>
+                    <div class="form-group">
+                        <label>Nome da Assistência Técnica</label>
+                        <input type="text" id="gp-os-assistencia" placeholder="Ex: TechFix Araranguá">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label style="display:flex;align-items:center;gap:8px">
+                        Nota Fiscal em PDF
+                        <span style="background:#f44336;color:#fff;font-size:10px;padding:1px 7px;border-radius:10px;font-weight:800">OBRIGATÓRIO</span>
+                    </label>
+                    <div class="file-input-wrapper">
+                        <label class="file-label" onclick="document.getElementById('gp-pdf').click()">📄 Clique para anexar a Nota Fiscal</label>
+                        <input type="file" id="gp-pdf" accept="application/pdf" onchange="handleGpPdf(event)">
+                    </div>
+                    <div id="gp-pdf-name" style="margin-top:8px"></div>
+                </div>
+                <div class="form-group">
+                    <label>📷 Fotos do Produto (até 5)</label>
+                    <div class="file-input-wrapper">
+                        <label class="file-label" onclick="document.getElementById('gp-fotos').click()">Adicionar fotos</label>
+                        <input type="file" id="gp-fotos" accept="image/*" multiple onchange="handleGpFotos(event)">
+                    </div>
+                    <div class="gallery" id="gp-gallery"></div>
+                </div>
+                <div class="form-group">
+                    <label>👤 Responsável</label>
+                    <select id="gp-responsavel">
+                        <option value="">Selecionar responsável...</option>
+                    </select>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancelar</button>
@@ -1059,6 +1154,7 @@
         </div>
         <div class="modal-body" id="detalhe-garantia-produto-body"></div>
         <div class="modal-footer">
+            <button class="btn" style="background:#FF9800" onclick="editarGarantiaProduto(currentDetailId)">✏️ Editar</button>
             <button class="btn" onclick="abrirImpressao('garantia_produto')">🖨️ Imprimir</button>
             <button type="button" class="btn btn-danger" onclick="deletarGarantiaProduto()">Deletar</button>
             <button type="button" class="btn btn-secondary" onclick="closeModal()">Fechar</button>
@@ -1068,31 +1164,52 @@
     <!-- MODAL: Nova Garantia Tela -->
     <div id="nova-garantia-tela-form" style="display:none;">
         <div class="modal-header">
-            <h2>Nova Solicitação de Garantia de Tela</h2>
+            <h2 id="gt-modal-titulo">📱 Nova Garantia de Tela</h2>
             <button class="modal-close" onclick="closeModal()">×</button>
         </div>
         <div class="modal-body">
             <form onsubmit="salvarGarantiaTela(event)">
+                <input type="hidden" id="gt-edit-id" value="">
                 <div class="form-group">
-                    <label>Cliente</label>
-                    <select id="gt-cliente" required>
-                        <option value="">Selecione...</option>
-                    </select>
+                    <label>Cliente *</label>
+                    <div style="position:relative">
+                        <input type="text" id="gt-cliente-search" placeholder="Digite o nome do cliente..." autocomplete="off"
+                            oninput="buscarClientesGT(this.value)" onfocus="buscarClientesGT(this.value)"
+                            style="width:100%;padding:10px;border:1px solid #ddd;border-radius:4px;font-size:14px">
+                        <input type="hidden" id="gt-cliente-id">
+                        <div id="gt-cliente-dropdown" style="display:none;position:absolute;top:100%;left:0;right:0;background:#fff;border:1px solid #ddd;border-radius:0 0 4px 4px;max-height:150px;overflow-y:auto;z-index:100;box-shadow:0 4px 8px rgba(0,0,0,.1)"></div>
+                    </div>
+                    <div id="novo-cliente-gt-inline"></div>
                 </div>
                 <div class="form-group">
-                    <label>Loja</label>
+                    <label>Loja *</label>
                     <select id="gt-loja" required>
                         <option value="">Selecione...</option>
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>Modelo do Celular</label>
-                    <input type="text" id="gt-modelo" required>
+                    <label>Marca / Modelo do Celular *</label>
+                    <input type="text" id="gt-modelo" required placeholder="Ex: Samsung Galaxy S23">
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+                    <div class="form-group">
+                        <label>Data de Instalação *</label>
+                        <input type="date" id="gt-data-instalacao" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Prazo de Garantia *</label>
+                        <select id="gt-prazo-dias" required>
+                            <option value="">Selecione...</option>
+                            <option value="90">90 dias</option>
+                            <option value="180">180 dias</option>
+                            <option value="365">365 dias (1 ano)</option>
+                        </select>
+                    </div>
                 </div>
                 <div class="form-group">
-                    <label>Fotos do Problema</label>
+                    <label>📷 Fotos da Instalação</label>
                     <div class="file-input-wrapper">
-                        <label class="file-label" onclick="document.getElementById('gt-fotos').click()">Clique para enviar fotos</label>
+                        <label class="file-label" onclick="document.getElementById('gt-fotos').click()">Adicionar fotos</label>
                         <input type="file" id="gt-fotos" accept="image/*" multiple onchange="handleGtFotos(event)">
                     </div>
                     <div class="gallery" id="gt-gallery"></div>
@@ -1100,10 +1217,16 @@
                 <div class="form-group">
                     <label>Contrato Assinado (PDF)</label>
                     <div class="file-input-wrapper">
-                        <label class="file-label" onclick="document.getElementById('gt-pdf').click()">Clique para enviar PDF do contrato</label>
+                        <label class="file-label" onclick="document.getElementById('gt-pdf').click()">📄 Clique para enviar PDF do contrato</label>
                         <input type="file" id="gt-pdf" accept="application/pdf" onchange="handleGtPdf(event)">
                     </div>
-                    <div id="gt-pdf-name" style="margin-top: 10px;"></div>
+                    <div id="gt-pdf-name" style="margin-top:8px"></div>
+                </div>
+                <div class="form-group">
+                    <label>👤 Responsável (Técnico)</label>
+                    <select id="gt-responsavel">
+                        <option value="">Selecionar responsável...</option>
+                    </select>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancelar</button>
@@ -1121,6 +1244,7 @@
         </div>
         <div class="modal-body" id="detalhe-garantia-tela-body"></div>
         <div class="modal-footer">
+            <button class="btn" style="background:#FF9800" onclick="editarGarantiaTela(currentDetailId)">✏️ Editar</button>
             <button class="btn" onclick="abrirImpressao('garantia_tela')">🖨️ Imprimir</button>
             <button type="button" class="btn btn-danger" onclick="deletarGarantiaTela()">Deletar</button>
             <button type="button" class="btn btn-secondary" onclick="closeModal()">Fechar</button>
@@ -1130,25 +1254,48 @@
     <!-- MODAL: Novo Lote Produção Loja -->
     <div id="novo-lote-form" style="display:none;">
         <div class="modal-header">
-            <h2>Novo Lote de Produção</h2>
+            <h2 id="lote-modal-titulo">📦 Novo Pedido</h2>
             <button class="modal-close" onclick="closeModal()">×</button>
         </div>
         <div class="modal-body">
             <form onsubmit="salvarLote(event)">
+                <input type="hidden" id="lote-edit-id" value="">
+                <input type="hidden" id="lote-tipo">
                 <div class="form-group">
-                    <label>Loja</label>
-                    <select id="lote-loja" required onchange="preencherNomeLote()">
+                    <label>Loja *</label>
+                    <select id="lote-loja" required>
                         <option value="">Selecione...</option>
                     </select>
                 </div>
+                <!-- Responsável -->
                 <div class="form-group">
-                    <label>Nome do Lote</label>
-                    <p id="lote-nome-display" style="color: #FF9800; font-weight: bold; padding: 10px; background: #fff8f0; border-radius: 4px;"></p>
+                    <label>👤 Responsável pelo Pedido</label>
+                    <select id="lote-responsavel">
+                        <option value="">Selecionar responsável...</option>
+                    </select>
                 </div>
+                <!-- Modelos/Itens -->
                 <div class="form-group">
-                    <label>Modelos do Lote</label>
+                    <label id="lote-itens-label">Modelos do Pedido</label>
                     <div id="modelos-container"></div>
-                    <button type="button" class="btn btn-secondary" onclick="adicionarModelo()">+ Adicionar Modelo</button>
+                    <button type="button" class="btn btn-secondary" style="margin-top:8px" onclick="adicionarModelo()">+ Adicionar Item</button>
+                </div>
+                <!-- Credenciais de Login -->
+                <div style="background:#e8f5e9;border:1px solid #a5d6a7;border-radius:8px;padding:14px;margin-bottom:12px">
+                    <div style="font-weight:700;font-size:12px;color:#2e7d32;margin-bottom:10px">🔐 Credenciais de Login (opcional)</div>
+                    <p style="font-size:11px;color:#555;margin-bottom:10px">Defina o e-mail e senha que a loja usará para acessar o CRM. A senha só é atualizada se preenchida.</p>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+                        <div class="form-group" style="margin:0">
+                            <label style="font-size:12px">E-mail de Acesso</label>
+                            <input type="email" id="loja-email-login" placeholder="loja@email.com"
+                                style="width:100%;padding:8px;border:1px solid #a5d6a7;border-radius:4px;font-size:13px">
+                        </div>
+                        <div class="form-group" style="margin:0">
+                            <label style="font-size:12px">Nova Senha (deixe em branco para manter)</label>
+                            <input type="password" id="loja-senha-login" placeholder="Mínimo 6 caracteres"
+                                style="width:100%;padding:8px;border:1px solid #a5d6a7;border-radius:4px;font-size:13px">
+                        </div>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancelar</button>
@@ -1166,6 +1313,7 @@
         </div>
         <div class="modal-body" id="detalhe-lote-body"></div>
         <div class="modal-footer">
+            <button class="btn" style="background:#FF9800" onclick="editarLote(currentDetailId)">✏️ Editar</button>
             <button class="btn" onclick="abrirImpressao('lote')">🖨️ Imprimir</button>
             <button type="button" class="btn btn-danger" onclick="deletarLote()">Deletar</button>
             <button type="button" class="btn btn-secondary" onclick="closeModal()">Fechar</button>
@@ -1285,7 +1433,8 @@
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBseG5qc2lhZ2d4ZGh0b3ZpbXp2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY5MzUyODQsImV4cCI6MjA5MjUxMTI4NH0.qFbLc2wwyMYTsDXOHY4wWNjm4Md6ZZsyIh4yduWt9bA';
         const _sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        let currentSession = null; // { id, nome, email, loja_id, funcao }
+        let currentSession = null; // { loja_id, loja_nome, email }
+        let funcionariosCache = []; // funcionarios da loja logada
         let lojasCache    = [];
         let clientesCache = [];
 
@@ -1295,29 +1444,28 @@
         }
 
         async function fazerLogin() {
-            const email = (document.getElementById('login-email').value || '').trim();
+            const email = (document.getElementById('login-email').value || '').trim().toLowerCase();
             const senha = document.getElementById('login-senha').value || '';
             const errEl = document.getElementById('login-error');
             errEl.style.display = 'none';
             if (!email || !senha) {
-                errEl.textContent = 'Preencha e-mail e senha.';
+                errEl.textContent = 'Preencha e-mail e senha da loja.';
                 errEl.style.display = 'block';
                 return;
             }
             const senhaHash = await sha256(senha);
             const { data, error } = await _sb
-                .from('funcionarios')
+                .from('lojas')
                 .select('*')
                 .eq('email', email)
                 .eq('senha', senhaHash)
-                .eq('ativo', true)
                 .maybeSingle();
             if (error || !data) {
-                errEl.textContent = 'E-mail ou senha incorretos.';
+                errEl.textContent = 'E-mail ou senha da loja incorretos.';
                 errEl.style.display = 'block';
                 return;
             }
-            currentSession = { id: data.id, nome: data.nome, email: data.email, loja_id: data.loja_id, funcao: data.funcao };
+            currentSession = { loja_id: data.id, loja_nome: data.nome_fantasia, email: data.email };
             localStorage.setItem('cbcrm_session', JSON.stringify(currentSession));
             await iniciarApp();
         }
@@ -1342,23 +1490,25 @@
             clientesCache = data || [];
         }
 
-        async function iniciarApp() {
-            await Promise.all([carregarLojasCache(), carregarClientesCache()]);
+        async function carregarFuncionariosCache() {
+            if (!currentSession || !currentSession.loja_id) { funcionariosCache = []; return; }
+            const { data } = await _sb.from('funcionarios')
+                .select('id, nome, cargo')
+                .eq('loja_id', currentSession.loja_id)
+                .eq('ativo', true)
+                .order('nome');
+            funcionariosCache = data || [];
+        }
 
-            // Sidebar user info
+        async function iniciarApp() {
+            await Promise.all([carregarLojasCache(), carregarClientesCache(), carregarFuncionariosCache()]);
+
+            // Sidebar — mostra nome e e-mail da loja
             const su = document.getElementById('sidebar-user');
             if (su && currentSession) {
                 su.style.display = 'block';
-                document.getElementById('su-nome').textContent = currentSession.nome;
-                const loja = lojasCache.find(l => l.id === currentSession.loja_id);
-                document.getElementById('su-loja').textContent = loja ? loja.nome_fantasia : 'Gerência Geral';
-                const roleMap = { gerente: '👑 Gerente', vendedor: '💼 Vendedor', caixa: '💰 Caixa' };
-                document.getElementById('su-role').textContent = roleMap[currentSession.funcao] || currentSession.funcao;
-                // Ocultar menu Lojas para não-gerentes
-                if (currentSession.funcao !== 'gerente') {
-                    const menuLojas = document.getElementById('menu-lojas');
-                    if (menuLojas) menuLojas.style.display = 'none';
-                }
+                document.getElementById('su-nome').textContent = '🏪 ' + (currentSession.loja_nome || 'Loja');
+                document.getElementById('su-loja').textContent = currentSession.email || '';
             }
 
             document.getElementById('login-screen').style.display = 'none';
@@ -1429,6 +1579,9 @@
         let assistFotosBase64 = [];
         let gtFotosBase64 = [];
         let gtPdfBase64 = null;
+        let gpPdfBase64 = null;
+        let gpFotosBase64 = [];
+        let currentLoteTipo = 'transparente';
         let printContent = '';
 
         // INITIALIZE DATA (lojas e clientes agora vêm do Supabase)
@@ -1462,15 +1615,15 @@
 
                 // Reset campos de edição ao abrir novo
                 if (formId === 'nova-loja-form') {
-                    const el = document.getElementById('loja-form-titulo');
+                    const el = _modalEl('loja-form-titulo');
                     if (el) el.textContent = 'Nova Loja';
-                    const eid = document.getElementById('loja-edit-id');
+                    const eid = _modalEl('loja-edit-id');
                     if (eid) eid.value = '';
                 }
                 if (formId === 'novo-cliente-form') {
-                    const el = document.getElementById('cliente-form-titulo');
+                    const el = _modalEl('cliente-form-titulo');
                     if (el) el.textContent = 'Novo Cliente';
-                    const eid = document.getElementById('cliente-edit-id');
+                    const eid = _modalEl('cliente-edit-id');
                     if (eid) eid.value = '';
                 }
                 // cliente-loja removido — clientes não têm mais vínculo com loja
@@ -1478,17 +1631,38 @@
                 if (formId.includes('capa') && !formId.includes('detalhe')) {
                     populateSelect('capa-loja');
                 }
-                if (formId.includes('assistencia')) {
-                    populateSelect('assist-cliente');
+                if (formId === 'nova-assistencia-form') {
                     populateSelect('assist-loja');
+                    populateSelect('assist-responsavel');
+                    assistFotosBase64 = [];
+                    const niAssist = _modalEl('novo-cliente-assist-inline');
+                    if (niAssist) niAssist.innerHTML = htmlNovoClienteInline('assist');
+                    if (currentSession && currentSession.loja_id) {
+                        const sl = _modalEl('assist-loja');
+                        if (sl) { sl.value = currentSession.loja_id; sl.disabled = true; }
+                    }
                 }
-                if (formId.includes('garantia-produto')) {
-                    populateSelect('gp-cliente');
+                if (formId === 'nova-garantia-produto-form') {
                     populateSelect('gp-loja');
+                    populateSelect('gp-responsavel');
+                    gpPdfBase64 = null;
+                    gpFotosBase64 = [];
+                    const niGP = _modalEl('novo-cliente-gp-inline');
+                    if (niGP) niGP.innerHTML = htmlNovoClienteInline('gp');
+                    if (currentSession && currentSession.loja_id) {
+                        const sl = _modalEl('gp-loja');
+                        if (sl) { sl.value = currentSession.loja_id; sl.disabled = true; }
+                    }
                 }
-                if (formId.includes('garantia-tela')) {
-                    populateSelect('gt-cliente');
+                if (formId === 'nova-garantia-tela-form') {
                     populateSelect('gt-loja');
+                    populateSelect('gt-responsavel');
+                    const niGT = _modalEl('novo-cliente-gt-inline');
+                    if (niGT) niGT.innerHTML = htmlNovoClienteInline('gt');
+                    if (currentSession && currentSession.loja_id) {
+                        const sl = _modalEl('gt-loja');
+                        if (sl) { sl.value = currentSession.loja_id; sl.disabled = true; }
+                    }
                 }
             }
         }
@@ -1510,6 +1684,8 @@
             assistFotosBase64 = [];
             gtFotosBase64 = [];
             gtPdfBase64 = null;
+            gpPdfBase64 = null;
+            gpFotosBase64 = [];
         }
 
         function fecharModalCapa() {
@@ -1518,9 +1694,19 @@
             }
         }
 
+        // =====================================================================
+        // MODAL ELEMENT LOOKUP — always prefers #modal-content over hidden templates
+        // This prevents duplicate-ID bugs when openModal copies template innerHTML
+        // =====================================================================
+        function _modalEl(id) {
+            const mc = document.getElementById('modal-content');
+            if (mc) { const el = mc.querySelector('[id="' + id + '"]'); if (el) return el; }
+            return document.getElementById(id);
+        }
+
         // UTILITIES
         function populateSelect(selectId) {
-            const select = document.getElementById(selectId);
+            const select = _modalEl(selectId);
             if (!select) return;
 
             if (selectId.includes('cliente')) {
@@ -1538,6 +1724,22 @@
                         return `<option value="${l.id}">${nome}${cidade}</option>`;
                     }).join('');
             }
+
+            if (selectId.includes('responsavel')) {
+                select.innerHTML = '<option value="">Selecione o responsável...</option>' +
+                    funcionariosCache.map(f => `<option value="${f.id}">${f.nome}${f.cargo?' — '+f.cargo:''}</option>`).join('');
+            }
+        }
+
+        // HTML helper para campo Responsável (igual em todos os funis)
+        function htmlResponsavel(prefixo) {
+            return `<div class="form-group">
+                <label>👤 Responsável</label>
+                <select id="${prefixo}-responsavel">
+                    <option value="">Selecionar responsável...</option>
+                    ${funcionariosCache.map(f=>`<option value="${f.id}">${f.nome}${f.cargo?' — '+f.cargo:''}</option>`).join('')}
+                </select>
+            </div>`;
         }
 
         function getClienteNome(id) {
@@ -1550,6 +1752,12 @@
             const sc = lojasCache.find(l => l.id === id);
             if (sc) return sc.nome_fantasia || sc.nome || 'Desconhecida';
             return loadStorage('cbcrm_lojas').find(l => l.id === id)?.nome || 'Desconhecida';
+        }
+
+        function getResponsavelNome(id) {
+            if (!id) return '';
+            const f = funcionariosCache.find(f => f.id === id);
+            return f ? f.nome : '';
         }
 
         // CAPAS PERSONALIZADAS — variáveis globais
@@ -1615,6 +1823,61 @@
             ['nc-nome','nc-telefone','nc-cpf','nc-email','nc-cep','nc-endereco'].forEach(id => {
                 const el = document.getElementById(id); if (el) el.value = '';
             });
+        }
+
+        // ---- Cadastro inline de cliente (genérico para todos os funis) ----
+        function toggleNovoClienteInline(prefixo) {
+            // These IDs are injected dynamically into modal — no duplicate risk
+            const f = document.getElementById(`novo-cliente-${prefixo}-form`);
+            if (f) f.style.display = f.style.display === 'none' ? 'block' : 'none';
+        }
+        async function salvarNovoClienteInline(prefixo) {
+            const nome  = (document.getElementById(`nc2-nome-${prefixo}`)?.value||'').trim();
+            const tel   = (document.getElementById(`nc2-tel-${prefixo}`)?.value||'').trim();
+            const cpf   = (document.getElementById(`nc2-cpf-${prefixo}`)?.value||'').trim();
+            const email = (document.getElementById(`nc2-email-${prefixo}`)?.value||'').trim();
+            if (!nome||!tel) { alert('Preencha pelo menos nome e telefone.'); return; }
+            const { data, error } = await _sb.from('clientes')
+                .insert([{ nome, whatsapp: tel, cpf, email }])
+                .select().maybeSingle();
+            if (error) { alert('Erro ao salvar cliente: ' + error.message); return; }
+            if (data) {
+                clientesCache.push(data);
+                // Use _modalEl to target modal's copy (not hidden template)
+                const idEl = _modalEl(`${prefixo}-cliente-id`);
+                const searchEl = _modalEl(`${prefixo}-cliente-search`);
+                if (idEl) idEl.value = data.id;
+                if (searchEl) searchEl.value = data.nome;
+            }
+            const f = document.getElementById(`novo-cliente-${prefixo}-form`);
+            if (f) f.style.display = 'none';
+            ['nome','tel','cpf','email'].forEach(k => {
+                const el = document.getElementById(`nc2-${k}-${prefixo}`); if (el) el.value = '';
+            });
+        }
+        // HTML reutilizável para o bloco inline de novo cliente
+        function htmlNovoClienteInline(prefixo) {
+            return `<div style="margin-top:6px">
+                <button type="button" onclick="toggleNovoClienteInline('${prefixo}')"
+                    style="background:none;border:none;color:#FF9800;font-size:12px;cursor:pointer;padding:0;font-weight:600">➕ Cadastrar novo cliente</button>
+            </div>
+            <div id="novo-cliente-${prefixo}-form" style="display:none;margin-top:10px;background:#fffbf0;border:1px solid #FFE0B2;border-radius:8px;padding:12px">
+                <div style="font-weight:700;font-size:12px;color:#E65100;margin-bottom:8px">📝 Novo Cliente</div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+                    <div class="form-group" style="margin:0"><label style="font-size:11px">Nome *</label>
+                        <input type="text" id="nc2-nome-${prefixo}" style="padding:6px 8px;font-size:12px;width:100%"></div>
+                    <div class="form-group" style="margin:0"><label style="font-size:11px">Telefone *</label>
+                        <input type="text" id="nc2-tel-${prefixo}" style="padding:6px 8px;font-size:12px;width:100%" placeholder="(00) 00000-0000"></div>
+                    <div class="form-group" style="margin:0"><label style="font-size:11px">CPF</label>
+                        <input type="text" id="nc2-cpf-${prefixo}" style="padding:6px 8px;font-size:12px;width:100%" placeholder="000.000.000-00"></div>
+                    <div class="form-group" style="margin:0"><label style="font-size:11px">E-mail</label>
+                        <input type="email" id="nc2-email-${prefixo}" style="padding:6px 8px;font-size:12px;width:100%"></div>
+                </div>
+                <button type="button" onclick="salvarNovoClienteInline('${prefixo}')"
+                    style="margin-top:8px;background:#FF9800;color:#fff;border:none;border-radius:4px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer">Salvar</button>
+                <button type="button" onclick="toggleNovoClienteInline('${prefixo}')"
+                    style="margin-top:8px;margin-left:6px;background:none;color:#aaa;border:none;font-size:12px;cursor:pointer">Cancelar</button>
+            </div>`;
         }
 
         // ---- Pagamento parcial ----
@@ -2021,6 +2284,44 @@
             }, 200);
         }
 
+        // =====================================================================
+        // STAGES — ASSISTÊNCIA TÉCNICA
+        // =====================================================================
+        const ASSIST_STAGES = [
+            {id:'recebido',     label:'Recebido',            icon:'📥', color:'#607D8B'},
+            {id:'diagnostico',  label:'Diagnóstico',         icon:'🔍', color:'#2196F3'},
+            {id:'orcamento',    label:'Orçamento Enviado',   icon:'💰', color:'#FF9800'},
+            {id:'ag_aprovacao', label:'Ag. Aprovação',       icon:'⏳', color:'#9C27B0'},
+            {id:'em_reparo',    label:'Em Reparo',           icon:'🔧', color:'#FF5722'},
+            {id:'ag_peca',      label:'Ag. Peça',            icon:'⏸️', color:'#F44336'},
+            {id:'pronto',       label:'Pronto p/ Retirada',  icon:'✅', color:'#4CAF50'},
+            {id:'entregue',     label:'Entregue',            icon:'🎉', color:'#4DB6AC'},
+        ];
+
+        // =====================================================================
+        // STAGES — GARANTIA DE PRODUTOS
+        // =====================================================================
+        const GP_STAGES = [
+            {id:'solicitado', label:'Solicitado',        icon:'📋', color:'#607D8B'},
+            {id:'recebido',   label:'Produto Recebido',  icon:'📦', color:'#2196F3'},
+            {id:'analise',    label:'Em Análise',        icon:'🔍', color:'#FF9800'},
+            {id:'enviado',    label:'Enviado p/ Reparo', icon:'🚚', color:'#9C27B0'},
+            {id:'aprovado',   label:'Aprovado',          icon:'✅', color:'#4CAF50'},
+            {id:'reprovado',  label:'Reprovado',         icon:'❌', color:'#F44336'},
+            {id:'encerrado',  label:'Encerrado',         icon:'🏁', color:'#8BC34A'},
+        ];
+
+        // =====================================================================
+        // STAGES — PRODUÇÃO LOJA
+        // =====================================================================
+        const LOTE_STAGES = [
+            {id:'solicitado',  label:'Solicitado',   icon:'📋', color:'#607D8B'},
+            {id:'confirmado',  label:'Confirmado',   icon:'✅', color:'#2196F3'},
+            {id:'em_producao', label:'Em Produção',  icon:'🏭', color:'#FF9800'},
+            {id:'pronto',      label:'Pronto',       icon:'📦', color:'#4CAF50'},
+            {id:'entregue',    label:'Entregue',     icon:'🎉', color:'#4DB6AC'},
+        ];
+
         const CAPA_STAGES = [
             {id:'produzir',      label:'Produzir',                icon:'🖨️',  color:'#2196F3'},
             {id:'ag_aprovacao',  label:'Aguardando Aprovação',    icon:'⏳',  color:'#FF9800'},
@@ -2036,7 +2337,7 @@
         function renderCapas() {
             let capas = loadStorage('cbcrm_capas');
             // Controle de acesso: não-gerentes veem somente a sua loja
-            if (currentSession && currentSession.funcao !== 'gerente' && currentSession.loja_id) {
+            if (currentSession && currentSession.loja_id) {
                 capas = capas.filter(c => c.loja_id === currentSession.loja_id);
             }
             let html = '<div class="kanban-board">';
@@ -2329,11 +2630,11 @@
 
         // ASSISTÊNCIA TÉCNICA
         function handleAssistFotos(event) {
-            const files = event.target.files;
+            const files = Array.from(event.target.files).slice(0, 10);
             assistFotosBase64 = [];
             let loaded = 0;
-
-            Array.from(files).forEach(file => {
+            if (!files.length) return;
+            files.forEach(file => {
                 const reader = new FileReader();
                 reader.onload = (e) => {
                     assistFotosBase64.push(e.target.result);
@@ -2345,78 +2646,249 @@
         }
 
         function renderAssistGallery() {
-            const gallery = document.getElementById('assist-gallery');
+            const gallery = _modalEl('assist-gallery');
+            if (!gallery) return;
             gallery.innerHTML = assistFotosBase64.map((b64, i) =>
                 `<img src="${b64}" class="thumbnail">`
             ).join('');
         }
 
+        function buscarClientesAssist(q) {
+            const dd = _modalEl('assist-cliente-dropdown');
+            if (!dd) return;
+            const clientes = clientesCache.length > 0 ? clientesCache : loadStorage('cbcrm_clientes');
+            const filtrados = q && q.length > 0
+                ? clientes.filter(c => c.nome.toLowerCase().includes(q.toLowerCase()) || (c.whatsapp||'').includes(q))
+                : clientes.slice(0,10);
+            if (!filtrados.length) { dd.innerHTML='<div style="padding:8px 12px;color:#aaa;font-size:12px">Nenhum cliente encontrado</div>'; dd.style.display='block'; return; }
+            dd.innerHTML = filtrados.map(c =>
+                `<div onclick="selecionarClienteAssist('${c.id}','${c.nome.replace(/'/g,"\\'")}') "
+                    style="padding:8px 12px;cursor:pointer;font-size:13px;border-bottom:1px solid #f0f0f0"
+                    onmouseover="this.style.background='#fff8ee'" onmouseout="this.style.background=''">
+                    <strong>${c.nome}</strong>${c.whatsapp?` <span style="color:#aaa;font-size:11px">· ${c.whatsapp}</span>`:''}
+                </div>`
+            ).join('');
+            dd.style.display='block';
+        }
+        function selecionarClienteAssist(id, nome) {
+            _modalEl('assist-cliente-id').value = id;
+            _modalEl('assist-cliente-search').value = nome;
+            _modalEl('assist-cliente-dropdown').style.display='none';
+        }
+
         function salvarAssistencia(event) {
             event.preventDefault();
-            const assistencia = {
-                id: uid(),
-                cliente_id: document.getElementById('assist-cliente').value,
-                loja_id: document.getElementById('assist-loja').value,
-                descricao: document.getElementById('assist-descricao').value,
-                valor: parseFloat(document.getElementById('assist-valor').value),
-                fotos: assistFotosBase64,
-                data: ts(),
-                status: 'aberto'
-            };
-
+            const clienteId = (_modalEl('assist-cliente-id')||{}).value || '';
+            if (!clienteId) { alert('Selecione um cliente!'); return; }
+            const editId = (_modalEl('assist-edit-id')||{}).value || '';
             const assistencias = loadStorage('cbcrm_assistencia');
-            assistencias.push(assistencia);
+            if (editId) {
+                const idx = assistencias.findIndex(x => x.id === editId);
+                if (idx >= 0) {
+                    const a = assistencias[idx];
+                    a.cliente_id = clienteId;
+                    a.loja_id = (_modalEl('assist-loja')||{}).value || (currentSession?.loja_id||'');
+                    a.responsavel_id = (_modalEl('assist-responsavel')||{}).value || '';
+                    a.modelo = (_modalEl('assist-modelo')||{}).value || '';
+                    a.cor = (_modalEl('assist-cor')||{}).value || '';
+                    a.imei = (_modalEl('assist-imei')||{}).value || '';
+                    a.senha_aparelho = (_modalEl('assist-senha-aparelho')||{}).value || '';
+                    a.descricao = (_modalEl('assist-descricao')||{}).value || '';
+                    a.condicoes = (_modalEl('assist-condicoes')||{}).value || '';
+                    a.prazo = (_modalEl('assist-prazo')||{}).value || '';
+                    if (assistFotosBase64.length > 0) a.fotos = assistFotosBase64;
+                    if (!a.log) a.log = [];
+                    a.log.push({ msg: '✏️ OS editada', ts: ts() });
+                }
+            } else {
+                const numOs = 'AT-' + String(assistencias.length + 1).padStart(4, '0');
+                assistencias.push({
+                    id: uid(), num_os: numOs,
+                    cliente_id: clienteId,
+                    loja_id: (_modalEl('assist-loja')||{}).value || (currentSession?.loja_id||''),
+                    responsavel_id: (_modalEl('assist-responsavel')||{}).value || '',
+                    modelo: (_modalEl('assist-modelo')||{}).value || '',
+                    cor: (_modalEl('assist-cor')||{}).value || '',
+                    imei: (_modalEl('assist-imei')||{}).value || '',
+                    senha_aparelho: (_modalEl('assist-senha-aparelho')||{}).value || '',
+                    descricao: (_modalEl('assist-descricao')||{}).value || '',
+                    condicoes: (_modalEl('assist-condicoes')||{}).value || '',
+                    fotos: assistFotosBase64,
+                    prazo: (_modalEl('assist-prazo')||{}).value || '',
+                    stage: 'recebido', data: ts(),
+                    log: [{ msg: '📥 OS aberta', ts: ts() }]
+                });
+            }
             saveStorage('cbcrm_assistencia', assistencias);
+            assistFotosBase64 = [];
             closeModal();
             renderAssistencia();
         }
 
+        function editarAssistencia(id) {
+            const a = loadStorage('cbcrm_assistencia').find(x => x.id === id);
+            if (!a) return;
+            closeModal();
+            openModal('nova-assistencia-form');
+            setTimeout(() => {
+                const eId = _modalEl('assist-edit-id'); if (eId) eId.value = id;
+                const eSrc = _modalEl('assist-cliente-search'); if (eSrc) eSrc.value = getClienteNome(a.cliente_id);
+                const eCli = _modalEl('assist-cliente-id'); if (eCli) eCli.value = a.cliente_id;
+                const eLoja = _modalEl('assist-loja'); if (eLoja) eLoja.value = a.loja_id;
+                const eResp = _modalEl('assist-responsavel'); if (eResp) eResp.value = a.responsavel_id||'';
+                const eMod = _modalEl('assist-modelo'); if (eMod) eMod.value = a.modelo||'';
+                const eCor = _modalEl('assist-cor'); if (eCor) eCor.value = a.cor||'';
+                const eImei = _modalEl('assist-imei'); if (eImei) eImei.value = a.imei||'';
+                const eSenha = _modalEl('assist-senha-aparelho'); if (eSenha) eSenha.value = a.senha_aparelho||'';
+                const eDesc = _modalEl('assist-descricao'); if (eDesc) eDesc.value = a.descricao||'';
+                const eCond = _modalEl('assist-condicoes'); if (eCond) eCond.value = a.condicoes||'';
+                const ePrazo = _modalEl('assist-prazo'); if (ePrazo) ePrazo.value = a.prazo||'';
+                const titulo = document.getElementById('modal-content')?.querySelector('#assist-modal-titulo');
+                if (titulo) titulo.textContent = '✏️ Editar OS — Assistência Técnica';
+                const btnSubmit = document.getElementById('modal-content')?.querySelector('[type=submit]');
+                if (btnSubmit) btnSubmit.textContent = 'Salvar Alterações';
+            }, 60);
+        }
+
         function renderAssistencia() {
-            const assistencias = loadStorage('cbcrm_assistencia');
-            const tbody = document.getElementById('assistencia-tbody');
-            tbody.innerHTML = assistencias.map(a => `
-                <tr>
-                    <td>${a.id.substr(0, 8)}</td>
-                    <td>${getClienteNome(a.cliente_id)}</td>
-                    <td>${getLojaNome(a.loja_id)}</td>
-                    <td>${a.descricao.substr(0, 30)}...</td>
-                    <td>${formatMoney(a.valor)}</td>
-                    <td><span class="badge badge-warning">${a.status.toUpperCase()}</span></td>
-                    <td>
-                        <div class="action-buttons">
-                            <button class="icon-btn" onclick="detalheAssistenciaModal('${a.id}')">👁️</button>
-                            <button class="icon-btn" onclick="deletarAssistenciaById('${a.id}')" style="color: #f44336;">🗑️</button>
-                        </div>
-                    </td>
-                </tr>
-            `).join('');
+            let assistencias = loadStorage('cbcrm_assistencia');
+            if (currentSession && currentSession.loja_id) {
+                assistencias = assistencias.filter(a => a.loja_id === currentSession.loja_id);
+            }
+            const qAssist = (document.getElementById('assistencia-busca')?.value||'').trim().toLowerCase();
+            if (qAssist) {
+                assistencias = assistencias.filter(a =>
+                    getClienteNome(a.cliente_id).toLowerCase().includes(qAssist) ||
+                    (a.num_os||'').toLowerCase().includes(qAssist)
+                );
+            }
+            let html = '<div class="kanban-board">';
+            ASSIST_STAGES.forEach(st => {
+                const items = assistencias.filter(a => a.stage === st.id);
+                html += `<div class="kanban-column" style="border-top-color:${st.color}">
+                    <div class="kanban-header" style="color:${st.color}">
+                        <span>${st.icon} ${st.label}</span>
+                        <span class="kcount">${items.length}</span>
+                    </div>
+                    <div class="kanban-cards" data-stage="${st.id}" ondrop="dropAssist(event,'${st.id}')" ondragover="dragover(event)" ondragleave="dragleave(event)">
+                        ${items.map(a => {
+                            let prazoBadge = '';
+                            if (a.prazo) {
+                                const hoje = new Date(); hoje.setHours(0,0,0,0);
+                                const d = new Date(a.prazo + 'T00:00:00');
+                                const diff = Math.round((d - hoje)/(1000*60*60*24));
+                                const bg = diff < 0 ? '#b71c1c' : diff <= 2 ? '#e65100' : diff <= 5 ? '#f9a825' : '#2e7d32';
+                                const label = diff < 0 ? `⚠️ ${Math.abs(diff)}d atraso` : diff === 0 ? '🔴 HOJE!' : `📅 ${diff}d`;
+                                prazoBadge = `<span style="font-size:10px;font-weight:700;padding:2px 6px;border-radius:8px;background:${bg};color:#fff">${label}</span>`;
+                            }
+                            return `<div class="kanban-card" draggable="true" ondragstart="dragAssistStart(event)" data-id="${a.id}" style="border-left-color:${st.color};cursor:pointer" onclick="detalheAssistenciaModal('${a.id}')">
+                                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px">
+                                    <span style="font-size:9px;font-weight:800;color:#fff;background:${st.color};border-radius:4px;padding:1px 6px">${a.num_os||'OS-????'}</span>
+                                    <button onclick="event.stopPropagation();editarAssistencia('${a.id}')" style="font-size:10px;padding:2px 7px;background:#FF9800;color:#fff;border:none;border-radius:4px;cursor:pointer;font-weight:700">✏️</button>
+                                </div>
+                                <div style="font-weight:700;font-size:12px;margin:2px 0">${getClienteNome(a.cliente_id)}</div>
+                                <div style="font-size:11px;color:#555;margin-bottom:2px">📱 ${a.modelo||'Aparelho'}</div>
+                                <div style="font-size:10px;color:#888">🏪 ${getLojaNome(a.loja_id)}</div>
+                                ${prazoBadge ? `<div style="margin-top:5px">${prazoBadge}</div>` : ''}
+                            </div>`;
+                        }).join('')}
+                    </div>
+                </div>`;
+            });
+            html += '</div>';
+            document.getElementById('assistencia-kanban').innerHTML = html;
+        }
+
+        function dragAssistStart(event) {
+            event.dataTransfer.effectAllowed = 'move';
+            event.dataTransfer.setData('assist-id', event.target.dataset.id);
+            event.target.classList.add('dragging');
+        }
+
+        function dropAssist(event, newStage) {
+            event.preventDefault();
+            const id = event.dataTransfer.getData('assist-id');
+            let assistencias = loadStorage('cbcrm_assistencia');
+            const a = assistencias.find(x => x.id === id);
+            if (a) { a.stage = newStage; saveStorage('cbcrm_assistencia', assistencias); renderAssistencia(); }
+            document.querySelectorAll('.kanban-cards').forEach(c => c.classList.remove('drag-over'));
         }
 
         function detalheAssistenciaModal(id) {
-            const assistencia = loadStorage('cbcrm_assistencia').find(a => a.id === id);
-            if (!assistencia) return;
-
+            const a = loadStorage('cbcrm_assistencia').find(x => x.id === id);
+            if (!a) return;
             currentDetailId = id;
             currentDetailType = 'assistencia';
-
+            const responsavelNome = getResponsavelNome(a.responsavel_id);
+            const stagesOpts = ASSIST_STAGES.map(s =>
+                `<option value="${s.id}" ${s.id===a.stage?'selected':''}>${s.icon} ${s.label}</option>`).join('');
             let html = `
-                <p><strong>OS:</strong> ${id.substr(0, 8)}</p>
-                <p><strong>Cliente:</strong> ${getClienteNome(assistencia.cliente_id)}</p>
-                <p><strong>Loja:</strong> ${getLojaNome(assistencia.loja_id)}</p>
-                <p><strong>Descrição:</strong> ${assistencia.descricao}</p>
-                <p><strong>Valor:</strong> ${formatMoney(assistencia.valor)}</p>
-                <p><strong>Data:</strong> ${formatDate(assistencia.data)}</p>
-            `;
-
-            if (assistencia.fotos && assistencia.fotos.length > 0) {
-                html += '<p><strong>Fotos:</strong></p>';
-                html += '<div class="gallery">' + assistencia.fotos.map((f, i) =>
-                    `<img src="${f}" class="thumbnail">`
-                ).join('') + '</div>';
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;font-size:13px">
+                    <div><strong>OS:</strong> ${a.num_os||id.substr(0,8)}</div>
+                    <div><strong>Data:</strong> ${formatDate(a.data)}</div>
+                    <div><strong>Cliente:</strong> ${getClienteNome(a.cliente_id)}</div>
+                    <div><strong>Loja:</strong> ${getLojaNome(a.loja_id)}</div>
+                    <div><strong>Modelo:</strong> ${a.modelo||'—'}</div>
+                    <div><strong>Cor:</strong> ${a.cor||'—'}</div>
+                    <div><strong>IMEI:</strong> ${a.imei||'—'}</div>
+                    <div><strong>Senha:</strong> ${a.senha_aparelho||'—'}</div>
+                    <div><strong>Responsável:</strong> ${responsavelNome||'—'}</div>
+                    ${a.prazo ? `<div><strong>Prazo:</strong> ${a.prazo}</div>` : '<div></div>'}
+                </div>
+                <p style="margin-bottom:6px"><strong>Problema:</strong> ${a.descricao||'—'}</p>
+                <p style="margin-bottom:12px"><strong>Condições Externas:</strong> ${a.condicoes||'—'}</p>
+                <div style="background:#fff8e1;border:1px solid #ffe082;border-radius:8px;padding:12px;margin-bottom:12px">
+                    <div style="font-weight:700;font-size:12px;color:#f57f17;margin-bottom:8px">🔗 OS da Assistência Terceirizada</div>
+                    <div style="display:flex;gap:8px;align-items:center">
+                        <input type="text" id="assist-os-externo-input" value="${a.os_externo||''}" placeholder="Nº da OS da assistência parceira"
+                            style="flex:1;padding:8px;border:1px solid #ffe082;border-radius:4px;font-size:13px">
+                        <button type="button" onclick="salvarOsExterno('${id}')"
+                            style="background:#f57f17;color:#fff;border:none;border-radius:4px;padding:8px 14px;cursor:pointer;font-size:12px;font-weight:600;white-space:nowrap">💾 Salvar</button>
+                    </div>
+                </div>
+                <div style="margin-bottom:12px">
+                    <label style="font-weight:600;font-size:13px">Estágio atual:</label>
+                    <select onchange="moverAssistStage(this.value,'${id}')" style="width:100%;margin-top:4px;padding:8px;border:1px solid #ddd;border-radius:4px;font-size:13px">
+                        ${stagesOpts}
+                    </select>
+                </div>`;
+            if (a.fotos && a.fotos.length > 0) {
+                html += `<p style="margin-bottom:6px"><strong>Fotos (${a.fotos.length}):</strong></p><div class="gallery">${a.fotos.map(f=>`<img src="${f}" class="thumbnail">`).join('')}</div>`;
             }
-
+            if ((a.log||[]).length > 0) {
+                html += `<div style="margin-top:14px">
+                    <div style="font-weight:700;font-size:12px;color:#555;margin-bottom:6px">📜 Histórico</div>
+                    <div style="background:#f8f9fa;border-radius:6px;padding:10px;max-height:120px;overflow-y:auto">
+                        ${(a.log||[]).map(e=>`<div style="font-size:11px;color:#444;margin-bottom:4px;padding-bottom:4px;border-bottom:1px solid #eee">${e.msg} <span style="color:#aaa">${e.ts?new Date(e.ts).toLocaleString('pt-BR'):''}</span></div>`).reverse().join('')}
+                    </div>
+                </div>`;
+            }
             document.getElementById('detalhe-assistencia-body').innerHTML = html;
             openModal('detalhe-assistencia-modal');
+        }
+
+        function moverAssistStage(newStage, id) {
+            let assistencias = loadStorage('cbcrm_assistencia');
+            const a = assistencias.find(x => x.id === id);
+            if (!a) return;
+            const stageLabel = ASSIST_STAGES.find(s=>s.id===newStage)?.label||newStage;
+            a.stage = newStage;
+            if (!a.log) a.log = [];
+            a.log.push({ msg: `🔄 Movido para: ${stageLabel}`, ts: ts() });
+            saveStorage('cbcrm_assistencia', assistencias);
+            renderAssistencia();
+        }
+
+        function salvarOsExterno(id) {
+            const val = (document.getElementById('assist-os-externo-input')?.value||'').trim();
+            let assistencias = loadStorage('cbcrm_assistencia');
+            const a = assistencias.find(x => x.id === id);
+            if (!a) return;
+            a.os_externo = val;
+            if (!a.log) a.log = [];
+            if (val) a.log.push({ msg: `🔗 OS externa registrada: ${val}`, ts: ts() });
+            saveStorage('cbcrm_assistencia', assistencias);
+            alert('OS externa salva!');
         }
 
         function deletarAssistencia() {
@@ -2429,84 +2901,230 @@
             }
         }
 
-        function deletarAssistenciaById(id) {
-            if (confirm('Tem certeza que deseja deletar esta OS?')) {
-                let assistencias = loadStorage('cbcrm_assistencia');
-                assistencias = assistencias.filter(a => a.id !== id);
-                saveStorage('cbcrm_assistencia', assistencias);
-                renderAssistencia();
+        // GARANTIA DE PRODUTOS
+        function handleGpFotos(event) {
+            const files = Array.from(event.target.files).slice(0,5);
+            gpFotosBase64 = [];
+            let loaded = 0;
+            if (!files.length) return;
+            files.forEach(file => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    gpFotosBase64.push(e.target.result);
+                    loaded++;
+                    if (loaded === files.length) {
+                        const g = _modalEl('gp-gallery');
+                        if (g) g.innerHTML = gpFotosBase64.map(b=>`<img src="${b}" class="thumbnail">`).join('');
+                    }
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        function buscarClientesGP(q) {
+            const dd = _modalEl('gp-cliente-dropdown');
+            if (!dd) return;
+            const clientes = clientesCache.length > 0 ? clientesCache : loadStorage('cbcrm_clientes');
+            const filtrados = q && q.length > 0
+                ? clientes.filter(c => c.nome.toLowerCase().includes(q.toLowerCase()) || (c.whatsapp||'').includes(q))
+                : clientes.slice(0,10);
+            if (!filtrados.length) { dd.innerHTML='<div style="padding:8px 12px;color:#aaa;font-size:12px">Nenhum cliente encontrado</div>'; dd.style.display='block'; return; }
+            dd.innerHTML = filtrados.map(c =>
+                `<div onclick="selecionarClienteGP('${c.id}','${c.nome.replace(/'/g,"\\'")}') "
+                    style="padding:8px 12px;cursor:pointer;font-size:13px;border-bottom:1px solid #f0f0f0"
+                    onmouseover="this.style.background='#fff8ee'" onmouseout="this.style.background=''">
+                    <strong>${c.nome}</strong>${c.whatsapp?` <span style="color:#aaa;font-size:11px">· ${c.whatsapp}</span>`:''}
+                </div>`
+            ).join('');
+            dd.style.display='block';
+        }
+        function selecionarClienteGP(id, nome) {
+            _modalEl('gp-cliente-id').value = id;
+            _modalEl('gp-cliente-search').value = nome;
+            _modalEl('gp-cliente-dropdown').style.display='none';
+        }
+        function handleGpPdf(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    gpPdfBase64 = e.target.result;
+                    const el = _modalEl('gp-pdf-name');
+                    if (el) el.innerHTML = `<p style="color:#4CAF50;font-weight:600">✅ ${file.name}</p>`;
+                };
+                reader.readAsDataURL(file);
             }
         }
 
-        // GARANTIA DE PRODUTOS
         function salvarGarantiaProduto(event) {
             event.preventDefault();
-            const garantia = {
-                id: uid(),
-                cliente_id: document.getElementById('gp-cliente').value,
-                loja_id: document.getElementById('gp-loja').value,
-                produto: document.getElementById('gp-produto').value,
-                descricao: document.getElementById('gp-descricao').value,
-                stage: 'solicitado',
-                num_garantia: 'GP-' + Date.now(),
-                data: ts()
-            };
-
+            const clienteId = (_modalEl('gp-cliente-id')||{}).value || '';
+            if (!clienteId) { alert('Selecione um cliente!'); return; }
+            const codigoProduto = ((_modalEl('gp-codigo')||{}).value || '').trim();
+            if (!codigoProduto) { alert('O código do produto é obrigatório!'); return; }
+            const editId = (_modalEl('gp-edit-id')||{}).value || '';
             const garantias = loadStorage('cbcrm_garantia_produto');
-            garantias.push(garantia);
+            if (editId) {
+                const idx = garantias.findIndex(x => x.id === editId);
+                if (idx >= 0) {
+                    const g = garantias[idx];
+                    g.cliente_id = clienteId;
+                    g.loja_id = (_modalEl('gp-loja')||{}).value || (currentSession?.loja_id||'');
+                    g.responsavel_id = (_modalEl('gp-responsavel')||{}).value || '';
+                    g.produto = (_modalEl('gp-produto')||{}).value || '';
+                    g.codigo_produto = codigoProduto;
+                    g.descricao = (_modalEl('gp-descricao')||{}).value || '';
+                    g.os_numero = (_modalEl('gp-os-numero')||{}).value || '';
+                    g.os_assistencia = (_modalEl('gp-os-assistencia')||{}).value || '';
+                    if (gpFotosBase64.length > 0) g.fotos = gpFotosBase64;
+                    if (gpPdfBase64) g.pdf = gpPdfBase64;
+                    if (!g.log) g.log = [];
+                    g.log.push({ msg: '✏️ Garantia editada', ts: ts() });
+                }
+            } else {
+                if (!gpPdfBase64) { alert('A Nota Fiscal em PDF é obrigatória!'); return; }
+                const numGarantia = 'GP-' + String(garantias.length + 1).padStart(4, '0');
+                garantias.push({
+                    id: uid(), num_garantia: numGarantia,
+                    cliente_id: clienteId,
+                    loja_id: (_modalEl('gp-loja')||{}).value || (currentSession?.loja_id||''),
+                    responsavel_id: (_modalEl('gp-responsavel')||{}).value || '',
+                    produto: (_modalEl('gp-produto')||{}).value || '',
+                    codigo_produto: codigoProduto,
+                    descricao: (_modalEl('gp-descricao')||{}).value || '',
+                    os_numero: (_modalEl('gp-os-numero')||{}).value || '',
+                    os_assistencia: (_modalEl('gp-os-assistencia')||{}).value || '',
+                    fotos: gpFotosBase64, pdf: gpPdfBase64,
+                    stage: 'solicitado', data: ts(),
+                    log: [{ msg: '📋 Garantia solicitada', ts: ts() }]
+                });
+            }
             saveStorage('cbcrm_garantia_produto', garantias);
+            gpPdfBase64 = null; gpFotosBase64 = [];
             closeModal();
             renderGarantiaProduto();
         }
 
-        function renderGarantiaProduto() {
-            const stages = ['solicitado', 'recebido', 'analise', 'aprovado', 'reprovado', 'encerrado'];
-            const colors = ['#2196F3', '#FF9800', '#9C27B0', '#4CAF50', '#f44336', '#607D8B'];
-            const garantias = loadStorage('cbcrm_garantia_produto');
+        function editarGarantiaProduto(id) {
+            const g = loadStorage('cbcrm_garantia_produto').find(x => x.id === id);
+            if (!g) return;
+            closeModal();
+            openModal('nova-garantia-produto-form');
+            setTimeout(() => {
+                const eId = _modalEl('gp-edit-id'); if (eId) eId.value = id;
+                const eSrc = _modalEl('gp-cliente-search'); if (eSrc) eSrc.value = getClienteNome(g.cliente_id);
+                const eCli = _modalEl('gp-cliente-id'); if (eCli) eCli.value = g.cliente_id;
+                const eLoja = _modalEl('gp-loja'); if (eLoja) eLoja.value = g.loja_id;
+                const eResp = _modalEl('gp-responsavel'); if (eResp) eResp.value = g.responsavel_id||'';
+                const eProd = _modalEl('gp-produto'); if (eProd) eProd.value = g.produto||'';
+                const eCod = _modalEl('gp-codigo'); if (eCod) eCod.value = g.codigo_produto||'';
+                const eDesc = _modalEl('gp-descricao'); if (eDesc) eDesc.value = g.descricao||'';
+                const eOs = _modalEl('gp-os-numero'); if (eOs) eOs.value = g.os_numero||'';
+                const eOsA = _modalEl('gp-os-assistencia'); if (eOsA) eOsA.value = g.os_assistencia||'';
+                const titulo = document.getElementById('modal-content')?.querySelector('#gp-modal-titulo');
+                if (titulo) titulo.textContent = '✏️ Editar Garantia de Produto';
+                const btnSubmit = document.getElementById('modal-content')?.querySelector('[type=submit]');
+                if (btnSubmit) btnSubmit.textContent = 'Salvar Alterações';
+            }, 60);
+        }
 
-            let html = '<div class="kanban">';
-            stages.forEach((stage, i) => {
-                const stageGarantias = garantias.filter(g => g.stage === stage);
-                html += `
-                    <div class="kanban-column">
-                        <div class="kanban-header" style="border-bottom-color: ${colors[i]}">${stage.toUpperCase()}</div>
-                        <div class="kanban-cards" data-stage="${stage}" ondrop="dropGarantia(event, '${stage}')" ondragover="dragover(event)">
-                            ${stageGarantias.map(g => `
-                                <div class="kanban-card" draggable="true" ondragstart="dragGarantiaStart(event)" data-id="${g.id}" style="border-left-color: ${colors[i]}">
-                                    <div style="font-weight: 600; margin-bottom: 5px;">${g.produto}</div>
-                                    <div style="font-size: 12px; color: #666;">${getClienteNome(g.cliente_id)}</div>
-                                    <div style="font-size: 12px; color: #999;">${g.num_garantia}</div>
-                                    <div style="margin-top: 10px; text-align: right;">
-                                        <button class="icon-btn" onclick="detalheGarantiaProdutoModal('${g.id}')">👁️</button>
-                                    </div>
-                                </div>
-                            `).join('')}
-                        </div>
+        function renderGarantiaProduto() {
+            let garantias = loadStorage('cbcrm_garantia_produto');
+            if (currentSession && currentSession.loja_id) {
+                garantias = garantias.filter(g => g.loja_id === currentSession.loja_id);
+            }
+            const qGP = (document.getElementById('garantia-produto-busca')?.value||'').trim().toLowerCase();
+            if (qGP) {
+                garantias = garantias.filter(g =>
+                    getClienteNome(g.cliente_id).toLowerCase().includes(qGP) ||
+                    (g.num_garantia||'').toLowerCase().includes(qGP) ||
+                    (g.produto||'').toLowerCase().includes(qGP)
+                );
+            }
+            // Ensure kanban container exists (section might be block, not flex)
+            const container = document.getElementById('garantia-produto-kanban');
+            if (!container) return;
+            let html = '<div class="kanban-board">';
+            GP_STAGES.forEach(st => {
+                const items = garantias.filter(g => g.stage === st.id);
+                html += `<div class="kanban-column" style="border-top-color:${st.color}">
+                    <div class="kanban-header" style="color:${st.color}">
+                        <span>${st.icon} ${st.label}</span>
+                        <span class="kcount">${items.length}</span>
                     </div>
-                `;
+                    <div class="kanban-cards" data-stage="${st.id}" ondrop="dropGarantia(event,'${st.id}')" ondragover="dragover(event)" ondragleave="dragleave(event)">
+                        ${items.map(g => `
+                            <div class="kanban-card" draggable="true" ondragstart="dragGarantiaStart(event)" data-id="${g.id}" style="border-left-color:${st.color};cursor:pointer" onclick="detalheGarantiaProdutoModal('${g.id}')">
+                                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+                                    <span style="font-size:9px;font-weight:800;color:#fff;background:${st.color};border-radius:4px;padding:1px 6px">${g.num_garantia}</span>
+                                    <button onclick="event.stopPropagation();editarGarantiaProduto('${g.id}')" style="font-size:10px;padding:2px 7px;background:#FF9800;color:#fff;border:none;border-radius:4px;cursor:pointer;font-weight:700">✏️</button>
+                                </div>
+                                <div style="font-weight:700;font-size:12px;margin-bottom:2px">${g.produto}</div>
+                                ${g.codigo_produto ? `<div style="font-size:10px;color:#666;margin-bottom:2px">Cód: ${g.codigo_produto}</div>` : ''}
+                                <div style="font-size:11px;color:#555">${getClienteNome(g.cliente_id)}</div>
+                                <div style="font-size:10px;color:#888;margin-top:2px">🏪 ${getLojaNome(g.loja_id)}</div>
+                                ${g.os_numero ? `<div style="font-size:10px;color:#9C27B0;margin-top:2px">OS: ${g.os_numero}</div>` : ''}
+                            </div>`).join('')}
+                    </div>
+                </div>`;
             });
             html += '</div>';
-            document.getElementById('garantia-produto-kanban').innerHTML = html;
+            container.innerHTML = html;
         }
 
         function detalheGarantiaProdutoModal(id) {
-            const garantia = loadStorage('cbcrm_garantia_produto').find(g => g.id === id);
-            if (!garantia) return;
-
+            const g = loadStorage('cbcrm_garantia_produto').find(x => x.id === id);
+            if (!g) return;
             currentDetailId = id;
             currentDetailType = 'garantia_produto';
-
-            const html = `
-                <p><strong>Número:</strong> ${garantia.num_garantia}</p>
-                <p><strong>Cliente:</strong> ${getClienteNome(garantia.cliente_id)}</p>
-                <p><strong>Loja:</strong> ${getLojaNome(garantia.loja_id)}</p>
-                <p><strong>Produto:</strong> ${garantia.produto}</p>
-                <p><strong>Descrição:</strong> ${garantia.descricao}</p>
-                <p><strong>Data:</strong> ${formatDate(garantia.data)}</p>
-            `;
-
+            const responsavelNome = getResponsavelNome(g.responsavel_id);
+            const stagesOpts = GP_STAGES.map(s =>
+                `<option value="${s.id}" ${s.id===g.stage?'selected':''}>${s.icon} ${s.label}</option>`).join('');
+            let html = `
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;font-size:13px">
+                    <div><strong>Nº Garantia:</strong> ${g.num_garantia}</div>
+                    <div><strong>Data:</strong> ${formatDate(g.data)}</div>
+                    <div><strong>Cliente:</strong> ${getClienteNome(g.cliente_id)}</div>
+                    <div><strong>Loja:</strong> ${getLojaNome(g.loja_id)}</div>
+                    <div><strong>Produto:</strong> ${g.produto}</div>
+                    <div><strong>Código:</strong> <code style="background:#f5f5f5;padding:2px 6px;border-radius:4px">${g.codigo_produto||'—'}</code></div>
+                    <div><strong>OS Assist.:</strong> ${g.os_numero||'—'}</div>
+                    <div><strong>Responsável:</strong> ${responsavelNome||'—'}</div>
+                </div>
+                ${g.os_assistencia ? `<p style="margin-bottom:6px"><strong>Assistência:</strong> ${g.os_assistencia}</p>` : ''}
+                <p style="margin-bottom:8px"><strong>Problema:</strong> ${g.descricao||'—'}</p>
+                ${g.pdf ? `<p style="margin-bottom:12px"><strong>Nota Fiscal:</strong> <a href="${g.pdf}" target="_blank" style="color:#2196F3">📄 Abrir PDF</a></p>` : ''}`;
+            if (g.fotos && g.fotos.length > 0) {
+                html += `<p style="margin-bottom:6px"><strong>Fotos (${g.fotos.length}):</strong></p><div class="gallery">${g.fotos.map(f=>`<img src="${f}" class="thumbnail">`).join('')}</div>`;
+            }
+            html += `<div style="margin-top:12px">
+                <label style="font-weight:600;font-size:13px">Estágio atual:</label>
+                <select onchange="moverGPStage(this.value,'${id}')" style="width:100%;margin-top:4px;padding:8px;border:1px solid #ddd;border-radius:4px;font-size:13px">
+                    ${stagesOpts}
+                </select>
+            </div>`;
+            if ((g.log||[]).length > 0) {
+                html += `<div style="margin-top:14px">
+                    <div style="font-weight:700;font-size:12px;color:#555;margin-bottom:6px">📜 Histórico</div>
+                    <div style="background:#f8f9fa;border-radius:6px;padding:10px;max-height:120px;overflow-y:auto">
+                        ${(g.log||[]).map(e=>`<div style="font-size:11px;color:#444;margin-bottom:4px;padding-bottom:4px;border-bottom:1px solid #eee">${e.msg} <span style="color:#aaa">${e.ts?new Date(e.ts).toLocaleString('pt-BR'):''}</span></div>`).reverse().join('')}
+                    </div>
+                </div>`;
+            }
             document.getElementById('detalhe-garantia-produto-body').innerHTML = html;
             openModal('detalhe-garantia-produto-modal');
+        }
+
+        function moverGPStage(newStage, id) {
+            let garantias = loadStorage('cbcrm_garantia_produto');
+            const g = garantias.find(x => x.id === id);
+            if (!g) return;
+            const stageLabel = GP_STAGES.find(s=>s.id===newStage)?.label||newStage;
+            g.stage = newStage;
+            if (!g.log) g.log = [];
+            g.log.push({ msg: `🔄 Movido para: ${stageLabel}`, ts: ts() });
+            saveStorage('cbcrm_garantia_produto', garantias);
+            renderGarantiaProduto();
         }
 
         function deletarGarantiaProduto() {
@@ -2520,6 +3138,29 @@
         }
 
         // GARANTIA DE TELA
+        function buscarClientesGT(q) {
+            const dd = _modalEl('gt-cliente-dropdown');
+            if (!dd) return;
+            const clientes = clientesCache.length > 0 ? clientesCache : loadStorage('cbcrm_clientes');
+            const filtrados = q && q.length > 0
+                ? clientes.filter(c => c.nome.toLowerCase().includes(q.toLowerCase()) || (c.whatsapp||'').includes(q))
+                : clientes.slice(0,10);
+            if (!filtrados.length) { dd.innerHTML='<div style="padding:8px 12px;color:#aaa;font-size:12px">Nenhum cliente encontrado</div>'; dd.style.display='block'; return; }
+            dd.innerHTML = filtrados.map(c =>
+                `<div onclick="selecionarClienteGT('${c.id}','${c.nome.replace(/'/g,"\\'")}') "
+                    style="padding:8px 12px;cursor:pointer;font-size:13px;border-bottom:1px solid #f0f0f0"
+                    onmouseover="this.style.background='#fff8ee'" onmouseout="this.style.background=''">
+                    <strong>${c.nome}</strong>${c.whatsapp?` <span style="color:#aaa;font-size:11px">· ${c.whatsapp}</span>`:''}
+                </div>`
+            ).join('');
+            dd.style.display='block';
+        }
+        function selecionarClienteGT(id, nome) {
+            _modalEl('gt-cliente-id').value = id;
+            _modalEl('gt-cliente-search').value = nome;
+            _modalEl('gt-cliente-dropdown').style.display='none';
+        }
+
         function handleGtFotos(event) {
             const files = event.target.files;
             gtFotosBase64 = [];
@@ -2537,7 +3178,8 @@
         }
 
         function renderGtGallery() {
-            const gallery = document.getElementById('gt-gallery');
+            const gallery = _modalEl('gt-gallery');
+            if (!gallery) return;
             gallery.innerHTML = gtFotosBase64.map((b64, i) =>
                 `<img src="${b64}" class="thumbnail">`
             ).join('');
@@ -2549,7 +3191,8 @@
                 const reader = new FileReader();
                 reader.onload = (e) => {
                     gtPdfBase64 = e.target.result;
-                    document.getElementById('gt-pdf-name').innerHTML = `<p style="color: #4CAF50;">✓ ${file.name}</p>`;
+                    const el = _modalEl('gt-pdf-name');
+                    if (el) el.innerHTML = `<p style="color: #4CAF50;">✓ ${file.name}</p>`;
                 };
                 reader.readAsDataURL(file);
             }
@@ -2557,71 +3200,176 @@
 
         function salvarGarantiaTela(event) {
             event.preventDefault();
-            const garantia = {
-                id: uid(),
-                cliente_id: document.getElementById('gt-cliente').value,
-                loja_id: document.getElementById('gt-loja').value,
-                modelo: document.getElementById('gt-modelo').value,
-                fotos: gtFotosBase64,
-                pdf: gtPdfBase64,
-                data: ts(),
-                status: 'pendente'
-            };
-
+            const clienteId = (_modalEl('gt-cliente-id')||{}).value || '';
+            if (!clienteId) { alert('Selecione um cliente!'); return; }
+            const editId = (_modalEl('gt-edit-id')||{}).value || '';
             const garantias = loadStorage('cbcrm_garantia_tela');
-            garantias.push(garantia);
+            if (editId) {
+                const idx = garantias.findIndex(x => x.id === editId);
+                if (idx >= 0) {
+                    const g = garantias[idx];
+                    g.cliente_id = clienteId;
+                    g.loja_id = (_modalEl('gt-loja')||{}).value || (currentSession?.loja_id||'');
+                    g.responsavel_id = (_modalEl('gt-responsavel')||{}).value || '';
+                    g.modelo = (_modalEl('gt-modelo')||{}).value || '';
+                    g.data_instalacao = (_modalEl('gt-data-instalacao')||{}).value || '';
+                    g.prazo_dias = parseInt((_modalEl('gt-prazo-dias')||{}).value)||0;
+                    if (gtFotosBase64.length > 0) g.fotos = gtFotosBase64;
+                    if (gtPdfBase64) g.pdf = gtPdfBase64;
+                }
+            } else {
+                garantias.push({
+                    id: uid(),
+                    cliente_id: clienteId,
+                    loja_id: (_modalEl('gt-loja')||{}).value || (currentSession?.loja_id||''),
+                    responsavel_id: (_modalEl('gt-responsavel')||{}).value || '',
+                    modelo: (_modalEl('gt-modelo')||{}).value || '',
+                    data_instalacao: (_modalEl('gt-data-instalacao')||{}).value || '',
+                    prazo_dias: parseInt((_modalEl('gt-prazo-dias')||{}).value)||0,
+                    fotos: gtFotosBase64, pdf: gtPdfBase64, data: ts()
+                });
+            }
             saveStorage('cbcrm_garantia_tela', garantias);
+            gtFotosBase64 = []; gtPdfBase64 = null;
             closeModal();
             renderGarantiaTela();
         }
 
+        function editarGarantiaTela(id) {
+            const g = loadStorage('cbcrm_garantia_tela').find(x => x.id === id);
+            if (!g) return;
+            closeModal();
+            openModal('nova-garantia-tela-form');
+            setTimeout(() => {
+                const eId = _modalEl('gt-edit-id'); if (eId) eId.value = id;
+                const eSrc = _modalEl('gt-cliente-search'); if (eSrc) eSrc.value = getClienteNome(g.cliente_id);
+                const eCli = _modalEl('gt-cliente-id'); if (eCli) eCli.value = g.cliente_id;
+                const eLoja = _modalEl('gt-loja'); if (eLoja) eLoja.value = g.loja_id;
+                const eResp = _modalEl('gt-responsavel'); if (eResp) eResp.value = g.responsavel_id||'';
+                const eMod = _modalEl('gt-modelo'); if (eMod) eMod.value = g.modelo||'';
+                const eData = _modalEl('gt-data-instalacao'); if (eData) eData.value = g.data_instalacao||'';
+                const ePrazo = _modalEl('gt-prazo-dias'); if (ePrazo) ePrazo.value = g.prazo_dias||'';
+                const titulo = document.getElementById('modal-content')?.querySelector('#gt-modal-titulo');
+                if (titulo) titulo.textContent = '✏️ Editar Garantia de Tela';
+                const btnSubmit = document.getElementById('modal-content')?.querySelector('[type=submit]');
+                if (btnSubmit) btnSubmit.textContent = 'Salvar Alterações';
+            }, 60);
+        }
+
         function renderGarantiaTela() {
-            const garantias = loadStorage('cbcrm_garantia_tela');
-            const tbody = document.getElementById('garantia-tela-tbody');
-            tbody.innerHTML = garantias.map(g => `
-                <tr>
-                    <td>${g.id.substr(0, 8)}</td>
-                    <td>${getClienteNome(g.cliente_id)}</td>
-                    <td>${getLojaNome(g.loja_id)}</td>
-                    <td>${g.modelo}</td>
-                    <td>${formatDate(g.data)}</td>
-                    <td><span class="badge badge-warning">${g.status.toUpperCase()}</span></td>
-                    <td>
-                        <div class="action-buttons">
-                            <button class="icon-btn" onclick="detalheGarantiaTelaModal('${g.id}')">👁️</button>
-                            <button class="icon-btn" onclick="deletarGarantiaTelaById('${g.id}')" style="color: #f44336;">🗑️</button>
-                        </div>
-                    </td>
-                </tr>
-            `).join('');
+            let garantias = loadStorage('cbcrm_garantia_tela');
+            if (currentSession && currentSession.loja_id) {
+                garantias = garantias.filter(g => g.loja_id === currentSession.loja_id);
+            }
+            const qGT = (document.getElementById('garantia-tela-busca')?.value||'').trim().toLowerCase();
+            if (qGT) {
+                garantias = garantias.filter(g =>
+                    getClienteNome(g.cliente_id).toLowerCase().includes(qGT) ||
+                    (g.modelo||'').toLowerCase().includes(qGT)
+                );
+            }
+            const grid = document.getElementById('garantia-tela-grid');
+            if (!grid) return;
+            if (!garantias.length) {
+                grid.innerHTML = '<p style="color:#999;padding:20px;text-align:center">Nenhuma garantia cadastrada.</p>';
+                return;
+            }
+            // Ordenar: vencidas primeiro, depois por data de vencimento
+            const calcVenc = g => {
+                if (!g.data_instalacao || !g.prazo_dias) return null;
+                const d = new Date(g.data_instalacao + 'T00:00:00');
+                d.setDate(d.getDate() + g.prazo_dias);
+                return d;
+            };
+            garantias.sort((a, b) => {
+                const va = calcVenc(a), vb = calcVenc(b);
+                if (!va && !vb) return 0; if (!va) return 1; if (!vb) return -1;
+                return va - vb;
+            });
+            grid.innerHTML = `
+            <table style="width:100%;border-collapse:collapse;background:#fff;border-radius:10px;overflow:hidden;box-shadow:0 1px 6px rgba(0,0,0,.07)">
+                <thead>
+                    <tr style="background:#1a1d2e;color:#fff;font-size:12px">
+                        <th style="padding:11px 14px;text-align:left;font-weight:600">Cliente</th>
+                        <th style="padding:11px 14px;text-align:left;font-weight:600">Modelo</th>
+                        <th style="padding:11px 14px;text-align:left;font-weight:600">Instalação</th>
+                        <th style="padding:11px 14px;text-align:left;font-weight:600">Vencimento</th>
+                        <th style="padding:11px 14px;text-align:left;font-weight:600">Prazo</th>
+                        <th style="padding:11px 14px;text-align:left;font-weight:600">Status</th>
+                        <th style="padding:11px 14px;text-align:center;font-weight:600">Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                ${garantias.map((g, idx) => {
+                    const venc = calcVenc(g);
+                    const vencStr = venc ? venc.toLocaleDateString('pt-BR') : '—';
+                    const hoje = new Date(); hoje.setHours(0,0,0,0);
+                    const dias = venc ? Math.round((venc - hoje)/(1000*60*60*24)) : null;
+                    let statusBadge = '<span style="color:#aaa">—</span>';
+                    let rowBg = idx % 2 === 0 ? '#fff' : '#f9f9f9';
+                    if (dias !== null) {
+                        if (dias < 0) {
+                            statusBadge = `<span style="background:#f44336;color:#fff;padding:2px 10px;border-radius:10px;font-size:11px;font-weight:700">● Vencida</span>`;
+                            rowBg = '#fff5f5';
+                        } else if (dias <= 30) {
+                            statusBadge = `<span style="background:#FF9800;color:#fff;padding:2px 10px;border-radius:10px;font-size:11px;font-weight:700">● ${dias}d restantes</span>`;
+                            rowBg = '#fffaf0';
+                        } else {
+                            statusBadge = `<span style="background:#4CAF50;color:#fff;padding:2px 10px;border-radius:10px;font-size:11px;font-weight:700">● Válida</span>`;
+                        }
+                    }
+                    return `<tr style="background:${rowBg};border-bottom:1px solid #eee"
+                        onmouseover="this.style.background='#f0f7ff'" onmouseout="this.style.background='${rowBg}'">
+                        <td style="padding:10px 14px;font-weight:600;font-size:13px;cursor:pointer" onclick="detalheGarantiaTelaModal('${g.id}')">${getClienteNome(g.cliente_id)}</td>
+                        <td style="padding:10px 14px;font-size:12px;color:#555;cursor:pointer" onclick="detalheGarantiaTelaModal('${g.id}')">📱 ${g.modelo}</td>
+                        <td style="padding:10px 14px;font-size:12px;color:#666;cursor:pointer" onclick="detalheGarantiaTelaModal('${g.id}')">${g.data_instalacao ? new Date(g.data_instalacao+'T00:00:00').toLocaleDateString('pt-BR') : '—'}</td>
+                        <td style="padding:10px 14px;font-size:12px;color:#666;cursor:pointer" onclick="detalheGarantiaTelaModal('${g.id}')">${vencStr}</td>
+                        <td style="padding:10px 14px;font-size:12px;color:#666;cursor:pointer" onclick="detalheGarantiaTelaModal('${g.id}')">${g.prazo_dias||'—'}d</td>
+                        <td style="padding:10px 14px;cursor:pointer" onclick="detalheGarantiaTelaModal('${g.id}')">${statusBadge}</td>
+                        <td style="padding:10px 14px;text-align:center">
+                            <button onclick="editarGarantiaTela('${g.id}')" style="font-size:11px;padding:4px 10px;background:#FF9800;color:#fff;border:none;border-radius:4px;cursor:pointer;font-weight:700">✏️ Editar</button>
+                        </td>
+                    </tr>`;
+                }).join('')}
+                </tbody>
+            </table>`;
         }
 
         function detalheGarantiaTelaModal(id) {
-            const garantia = loadStorage('cbcrm_garantia_tela').find(g => g.id === id);
-            if (!garantia) return;
-
+            const g = loadStorage('cbcrm_garantia_tela').find(x => x.id === id);
+            if (!g) return;
             currentDetailId = id;
             currentDetailType = 'garantia_tela';
-
+            let diasRestantes = '—', vencStr = '—';
+            if (g.data_instalacao && g.prazo_dias) {
+                const d = new Date(g.data_instalacao + 'T00:00:00');
+                d.setDate(d.getDate() + g.prazo_dias);
+                vencStr = d.toLocaleDateString('pt-BR');
+                const hoje = new Date(); hoje.setHours(0,0,0,0);
+                diasRestantes = Math.round((d - hoje)/(1000*60*60*24));
+            }
             let html = `
-                <p><strong>ID:</strong> ${id.substr(0, 8)}</p>
-                <p><strong>Cliente:</strong> ${getClienteNome(garantia.cliente_id)}</p>
-                <p><strong>Loja:</strong> ${getLojaNome(garantia.loja_id)}</p>
-                <p><strong>Modelo:</strong> ${garantia.modelo}</p>
-                <p><strong>Data:</strong> ${formatDate(garantia.data)}</p>
-            `;
-
-            if (garantia.fotos && garantia.fotos.length > 0) {
-                html += '<p><strong>Fotos:</strong></p>';
-                html += '<div class="gallery">' + garantia.fotos.map(f =>
-                    `<img src="${f}" class="thumbnail">`
-                ).join('') + '</div>';
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
+                    <div><strong>Cliente:</strong> ${getClienteNome(g.cliente_id)}</div>
+                    <div><strong>Loja:</strong> ${getLojaNome(g.loja_id)}</div>
+                    <div><strong>Modelo:</strong> ${g.modelo}</div>
+                    <div><strong>Prazo:</strong> ${g.prazo_dias||'—'} dias</div>
+                    <div><strong>Instalação:</strong> ${g.data_instalacao ? new Date(g.data_instalacao+'T00:00:00').toLocaleDateString('pt-BR') : '—'}</div>
+                    <div><strong>Vencimento:</strong> ${vencStr}</div>
+                </div>
+                <div style="text-align:center;margin:10px 0">
+                    ${typeof diasRestantes === 'number' && diasRestantes < 0
+                        ? `<span style="background:#f44336;color:#fff;padding:6px 18px;border-radius:20px;font-weight:700">❌ Vencida há ${Math.abs(diasRestantes)} dias</span>`
+                        : typeof diasRestantes === 'number' && diasRestantes <= 30
+                        ? `<span style="background:#FF9800;color:#fff;padding:6px 18px;border-radius:20px;font-weight:700">⚠️ Vence em ${diasRestantes} dias</span>`
+                        : typeof diasRestantes === 'number'
+                        ? `<span style="background:#4CAF50;color:#fff;padding:6px 18px;border-radius:20px;font-weight:700">✅ Válida — ${diasRestantes} dias restantes</span>`
+                        : ''}
+                </div>`;
+            if (g.pdf) html += `<p style="margin-top:8px"><strong>Contrato:</strong> <a href="${g.pdf}" target="_blank" style="color:#2196F3">📄 Abrir PDF</a></p>`;
+            if (g.fotos && g.fotos.length > 0) {
+                html += `<p style="margin-top:10px"><strong>Fotos:</strong></p><div class="gallery">${g.fotos.map(f=>`<img src="${f}" class="thumbnail">`).join('')}</div>`;
             }
-
-            if (garantia.pdf) {
-                html += `<p><strong>Contrato:</strong> <a href="${garantia.pdf}" class="pdf-link" target="_blank">📄 Abrir PDF</a></p>`;
-            }
-
             document.getElementById('detalhe-garantia-tela-body').innerHTML = html;
             openModal('detalhe-garantia-tela-modal');
         }
@@ -2636,98 +3384,238 @@
             }
         }
 
-        function deletarGarantiaTelaById(id) {
-            if (confirm('Tem certeza que deseja deletar esta garantia?')) {
-                let garantias = loadStorage('cbcrm_garantia_tela');
-                garantias = garantias.filter(g => g.id !== id);
-                saveStorage('cbcrm_garantia_tela', garantias);
-                renderGarantiaTela();
-            }
-        }
-
         // PRODUÇÃO LOJA
-        function preencherNomeLote() {
-            const lojaId = document.getElementById('lote-loja').value;
-            const loja = loadStorage('cbcrm_lojas').find(l => l.id === lojaId);
-            if (loja) {
-                document.getElementById('lote-nome-display').textContent = `${loja.nome} - ${formatDate(new Date())}`;
-            }
+        function abrirNovoLote(tipo) {
+            currentLoteTipo = tipo;
+            openModal('novo-lote-form');
+            // Após openModal copiar conteúdo, atualizar dinâmicos (sempre via _modalEl)
+            setTimeout(() => {
+                const editIdEl = _modalEl('lote-edit-id'); if (editIdEl) editIdEl.value = '';
+                const tituloEl = _modalEl('lote-modal-titulo');
+                const labelEl  = _modalEl('lote-itens-label');
+                if (tituloEl) tituloEl.textContent = tipo === 'personalizada' ? '🎨 Novo Pedido — Capas Personalizadas' : '🔲 Novo Pedido — Capas Transparentes';
+                if (labelEl)  labelEl.textContent  = tipo === 'personalizada' ? 'Modelos / Artes' : 'Modelos';
+                const tipoEl = _modalEl('lote-tipo');
+                if (tipoEl) tipoEl.value = tipo;
+                populateSelect('lote-loja');
+                populateSelect('lote-responsavel');
+                if (currentSession && currentSession.loja_id) {
+                    const sel = _modalEl('lote-loja');
+                    if (sel) { sel.value = currentSession.loja_id; sel.disabled = true; }
+                }
+                adicionarModelo();
+            }, 30);
         }
 
         function adicionarModelo() {
-            const container = document.getElementById('modelos-container');
+            const container = _modalEl('modelos-container');
+            if (!container) return;
+            const tipo = (_modalEl('lote-tipo') || {}).value || currentLoteTipo;
             const row = document.createElement('div');
             row.className = 'model-row';
-            row.innerHTML = `
-                <input type="text" placeholder="Modelo" class="modelo-input">
-                <input type="number" placeholder="Fem" min="0" class="qtd-fem-input">
-                <input type="number" placeholder="Masc" min="0" class="qtd-masc-input">
-                <textarea placeholder="Obs" style="resize: none; min-height: 40px;"></textarea>
-                <button type="button" class="btn btn-danger btn-small" onclick="this.parentElement.remove()">✕</button>
-            `;
+            row.style.cssText = 'background:#f8f9fa;border:1px solid #e8e8e8;border-radius:8px;padding:12px;margin-bottom:8px';
+            if (tipo === 'personalizada') {
+                row.innerHTML = `
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
+                        <input type="text" placeholder="Modelo (ex: iPhone 15)" class="modelo-input" style="padding:8px;border:1px solid #ddd;border-radius:4px;font-size:13px">
+                        <input type="text" placeholder="Estampa / Arte" class="estampa-input" style="padding:8px;border:1px solid #ddd;border-radius:4px;font-size:13px">
+                    </div>
+                    <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:6px;margin-bottom:8px">
+                        <div>
+                            <label style="font-size:11px;color:#666;display:block;margin-bottom:3px">Têm — Fem</label>
+                            <input type="number" class="tem-fem-input" min="0" value="0" style="width:100%;padding:6px;border:1px solid #ddd;border-radius:4px;font-size:12px">
+                        </div>
+                        <div>
+                            <label style="font-size:11px;color:#666;display:block;margin-bottom:3px">Têm — Masc</label>
+                            <input type="number" class="tem-masc-input" min="0" value="0" style="width:100%;padding:6px;border:1px solid #ddd;border-radius:4px;font-size:12px">
+                        </div>
+                        <div>
+                            <label style="font-size:11px;color:#9C27B0;display:block;margin-bottom:3px">Pedem — Fem</label>
+                            <input type="number" class="pedem-fem-input" min="0" value="0" style="width:100%;padding:6px;border:1px solid #CE93D8;border-radius:4px;font-size:12px">
+                        </div>
+                        <div>
+                            <label style="font-size:11px;color:#9C27B0;display:block;margin-bottom:3px">Pedem — Masc</label>
+                            <input type="number" class="pedem-masc-input" min="0" value="0" style="width:100%;padding:6px;border:1px solid #CE93D8;border-radius:4px;font-size:12px">
+                        </div>
+                    </div>
+                    <textarea placeholder="Obs / detalhes da arte" class="obs-input" style="width:100%;resize:none;min-height:36px;padding:6px;border:1px solid #ddd;border-radius:4px;font-size:12px;margin-bottom:6px"></textarea>
+                    <div style="text-align:right"><button type="button" class="btn btn-danger btn-small" onclick="this.closest('.model-row').remove()" style="font-size:11px">✕ Remover</button></div>`;
+            } else {
+                row.innerHTML = `
+                    <div style="display:grid;grid-template-columns:2fr 1fr 1fr;gap:8px;align-items:end">
+                        <div>
+                            <label style="font-size:11px;color:#666;display:block;margin-bottom:3px">Modelo</label>
+                            <input type="text" placeholder="Ex: Samsung S24" class="modelo-input" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:4px;font-size:13px">
+                        </div>
+                        <div>
+                            <label style="font-size:11px;color:#666;display:block;margin-bottom:3px">Têm em casa</label>
+                            <input type="number" class="tem-input" min="0" value="0" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:4px;font-size:13px">
+                        </div>
+                        <div>
+                            <label style="font-size:11px;color:#1976D2;display:block;margin-bottom:3px">Estão pedindo</label>
+                            <input type="number" class="pedem-input" min="0" value="0" style="width:100%;padding:8px;border:1px solid #90CAF9;border-radius:4px;font-size:13px">
+                        </div>
+                    </div>
+                    <div style="text-align:right;margin-top:6px"><button type="button" class="btn btn-danger btn-small" onclick="this.closest('.model-row').remove()" style="font-size:11px">✕ Remover</button></div>`;
+            }
             container.appendChild(row);
         }
 
         function salvarLote(event) {
             event.preventDefault();
-            const lojaId = document.getElementById('lote-loja').value;
-            const rows = document.querySelectorAll('#modelos-container .model-row');
+            const lojaId = (_modalEl('lote-loja')||{}).value || (currentSession?.loja_id||'');
+            const tipo = (_modalEl('lote-tipo')||{}).value || currentLoteTipo;
+            const editId = (_modalEl('lote-edit-id')||{}).value || '';
+            const mc = document.getElementById('modal-content');
+            const rows = (mc || document).querySelectorAll('#modelos-container .model-row');
             const modelos = [];
-
             rows.forEach(row => {
-                const modelo = row.querySelector('.modelo-input').value;
-                const qtd_feminina = parseInt(row.querySelector('.qtd-fem-input').value) || 0;
-                const qtd_masculina = parseInt(row.querySelector('.qtd-masc-input').value) || 0;
-                const obs = row.querySelector('textarea').value;
-
+                const modeloEl = row.querySelector('.modelo-input');
+                const estampaEl = row.querySelector('.estampa-input');
+                const obsEl = row.querySelector('.obs-input');
+                const modelo = modeloEl ? modeloEl.value.trim() : '';
                 if (modelo) {
-                    modelos.push({ id: uid(), modelo, qtd_feminina, qtd_masculina, obs });
+                    if (tipo === 'personalizada') {
+                        modelos.push({
+                            id: uid(), modelo,
+                            estampa: estampaEl ? estampaEl.value.trim() : '',
+                            tem_fem: parseInt(row.querySelector('.tem-fem-input')?.value)||0,
+                            tem_masc: parseInt(row.querySelector('.tem-masc-input')?.value)||0,
+                            pedem_fem: parseInt(row.querySelector('.pedem-fem-input')?.value)||0,
+                            pedem_masc: parseInt(row.querySelector('.pedem-masc-input')?.value)||0,
+                            obs: obsEl ? obsEl.value.trim() : ''
+                        });
+                    } else {
+                        modelos.push({
+                            id: uid(), modelo,
+                            tem: parseInt(row.querySelector('.tem-input')?.value)||0,
+                            pedem: parseInt(row.querySelector('.pedem-input')?.value)||0
+                        });
+                    }
                 }
             });
-
-            const lote = {
-                id: uid(),
-                loja_id: lojaId,
-                data_criacao: ts(),
-                stage: 'solicitado',
-                modelos: modelos
-            };
-
             const lotes = loadStorage('cbcrm_producao_loja');
-            lotes.push(lote);
+            if (editId) {
+                const idx = lotes.findIndex(x => x.id === editId);
+                if (idx >= 0) {
+                    const l = lotes[idx];
+                    l.loja_id = lojaId;
+                    l.responsavel_id = (_modalEl('lote-responsavel')||{}).value || '';
+                    l.modelos = modelos;
+                    if (!l.log) l.log = [];
+                    l.log.push({ msg: '✏️ Pedido editado', ts: ts() });
+                }
+            } else {
+                lotes.push({
+                    id: uid(), tipo, loja_id: lojaId,
+                    responsavel_id: (_modalEl('lote-responsavel')||{}).value || '',
+                    data_criacao: ts(), stage: 'solicitado', modelos,
+                    log: [{ msg: '📋 Pedido criado', ts: ts() }]
+                });
+            }
             saveStorage('cbcrm_producao_loja', lotes);
+            currentLoteTipo = tipo;
             closeModal();
+            renderProducaoLoja();
+            trocarTabProducao(tipo);
+        }
+
+        function editarLote(id) {
+            const l = loadStorage('cbcrm_producao_loja').find(x => x.id === id);
+            if (!l) return;
+            closeModal();
+            currentLoteTipo = l.tipo || 'transparente';
+            abrirNovoLote(currentLoteTipo);
+            setTimeout(() => {
+                const eId = _modalEl('lote-edit-id'); if (eId) eId.value = id;
+                const eLoja = _modalEl('lote-loja'); if (eLoja) eLoja.value = l.loja_id;
+                const eResp = _modalEl('lote-responsavel'); if (eResp) eResp.value = l.responsavel_id||'';
+                // Pre-fill modelos
+                const mc = document.getElementById('modal-content');
+                const container = mc ? mc.querySelector('#modelos-container') : document.getElementById('modelos-container');
+                if (container) {
+                    container.innerHTML = '';
+                    (l.modelos||[]).forEach(m => {
+                        adicionarModelo();
+                        const rows = container.querySelectorAll('.model-row');
+                        const row = rows[rows.length - 1];
+                        if (!row) return;
+                        const modEl = row.querySelector('.modelo-input'); if (modEl) modEl.value = m.modelo||'';
+                        if (l.tipo === 'personalizada') {
+                            const estEl = row.querySelector('.estampa-input'); if (estEl) estEl.value = m.estampa||'';
+                            const tfF = row.querySelector('.tem-fem-input'); if (tfF) tfF.value = m.tem_fem||0;
+                            const tmM = row.querySelector('.tem-masc-input'); if (tmM) tmM.value = m.tem_masc||0;
+                            const pfF = row.querySelector('.pedem-fem-input'); if (pfF) pfF.value = m.pedem_fem||0;
+                            const pmM = row.querySelector('.pedem-masc-input'); if (pmM) pmM.value = m.pedem_masc||0;
+                            const obsEl = row.querySelector('.obs-input'); if (obsEl) obsEl.value = m.obs||'';
+                        } else {
+                            const tEl = row.querySelector('.tem-input'); if (tEl) tEl.value = m.tem||0;
+                            const pEl = row.querySelector('.pedem-input'); if (pEl) pEl.value = m.pedem||0;
+                        }
+                    });
+                }
+                const titulo = document.getElementById('modal-content')?.querySelector('#lote-modal-titulo');
+                if (titulo) titulo.textContent = l.tipo === 'personalizada' ? '✏️ Editar Pedido — Personalizadas' : '✏️ Editar Pedido — Transparentes';
+                const btnSubmit = document.getElementById('modal-content')?.querySelector('[type=submit]');
+                if (btnSubmit) btnSubmit.textContent = 'Salvar Alterações';
+            }, 100);
+        }
+
+        let _tabAtiva = 'transparente';
+        function trocarTabProducao(tipo) {
+            _tabAtiva = tipo;
+            const tabT = document.getElementById('tab-transparente');
+            const tabP = document.getElementById('tab-personalizada');
+            if (tabT) {
+                tabT.style.background = tipo==='transparente' ? '#1a1d2e' : '#fff';
+                tabT.style.color = tipo==='transparente' ? '#fff' : '#555';
+                tabT.style.borderBottom = tipo==='transparente' ? '2px solid #1a1d2e' : '2px solid #eee';
+            }
+            if (tabP) {
+                tabP.style.background = tipo==='personalizada' ? '#9C27B0' : '#fff';
+                tabP.style.color = tipo==='personalizada' ? '#fff' : '#555';
+                tabP.style.borderBottom = tipo==='personalizada' ? '2px solid #9C27B0' : '2px solid #eee';
+            }
             renderProducaoLoja();
         }
 
         function renderProducaoLoja() {
-            const stages = ['solicitado', 'confirmado', 'em_producao', 'pronto', 'entregue'];
-            const colors = ['#2196F3', '#FF9800', '#9C27B0', '#4CAF50', '#00BCD4'];
-            const lotes = loadStorage('cbcrm_producao_loja');
-
-            let html = '<div class="kanban">';
-            stages.forEach((stage, i) => {
-                const stageLotes = lotes.filter(l => l.stage === stage);
-                html += `
-                    <div class="kanban-column">
-                        <div class="kanban-header" style="border-bottom-color: ${colors[i]}">${stage.replace('_', ' ').toUpperCase()}</div>
-                        <div class="kanban-cards" data-stage="${stage}" ondrop="dropLote(event, '${stage}')" ondragover="dragover(event)">
-                            ${stageLotes.map(l => {
-                                const loja = loadStorage('cbcrm_lojas').find(lo => lo.id === l.loja_id);
-                                const nomeLote = `${loja.nome} - ${formatDate(l.data_criacao)}`;
-                                return `
-                                    <div class="kanban-card" draggable="true" ondragstart="dragLoteStart(event)" data-id="${l.id}" style="border-left-color: ${colors[i]}">
-                                        <div style="font-weight: 600; margin-bottom: 5px;">${nomeLote}</div>
-                                        <div style="font-size: 12px; color: #666;">Modelos: ${l.modelos.length}</div>
-                                        <div style="margin-top: 10px; text-align: right;">
-                                            <button class="icon-btn" onclick="detalheLoteModal('${l.id}')">👁️</button>
-                                        </div>
-                                    </div>
-                                `;
-                            }).join('')}
-                        </div>
+            let lotes = loadStorage('cbcrm_producao_loja').filter(l => (l.tipo||'transparente') === _tabAtiva);
+            if (currentSession && currentSession.loja_id) {
+                lotes = lotes.filter(l => l.loja_id === currentSession.loja_id);
+            }
+            const qProd = (document.getElementById('producao-busca')?.value||'').trim().toLowerCase();
+            if (qProd) {
+                lotes = lotes.filter(l =>
+                    getLojaNome(l.loja_id).toLowerCase().includes(qProd) ||
+                    (l.modelos||[]).some(m => (m.modelo||'').toLowerCase().includes(qProd))
+                );
+            }
+            const cor = _tabAtiva === 'personalizada' ? '#9C27B0' : '#1a1d2e';
+            let html = '<div class="kanban-board">';
+            LOTE_STAGES.forEach(st => {
+                const items = lotes.filter(l => l.stage === st.id);
+                html += `<div class="kanban-column" style="border-top-color:${st.color}">
+                    <div class="kanban-header" style="color:${st.color}">
+                        <span>${st.icon} ${st.label}</span>
+                        <span class="kcount">${items.length}</span>
                     </div>
-                `;
+                    <div class="kanban-cards" data-stage="${st.id}" ondrop="dropLote(event,'${st.id}')" ondragover="dragover(event)" ondragleave="dragleave(event)">
+                        ${items.map(l => {
+                            const lojaNome = getLojaNome(l.loja_id);
+                            const totalItens = (l.modelos||[]).length;
+                            const modelosPreview = (l.modelos||[]).slice(0,2).map(m=>m.modelo).join(', ');
+                            return `<div class="kanban-card" draggable="true" ondragstart="dragLoteStart(event)" data-id="${l.id}" style="border-left-color:${st.color};cursor:pointer" onclick="detalheLoteModal('${l.id}')">
+                                <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:3px">
+                                    <div style="font-weight:700;font-size:12px">🏪 ${lojaNome}</div>
+                                    <button onclick="event.stopPropagation();editarLote('${l.id}')" style="font-size:10px;padding:2px 7px;background:#FF9800;color:#fff;border:none;border-radius:4px;cursor:pointer;font-weight:700;white-space:nowrap">✏️</button>
+                                </div>
+                                <div style="font-size:10px;color:#888;margin-bottom:3px">${formatDate(l.data_criacao)}</div>
+                                <div style="font-size:10px;color:#555;margin-bottom:4px">📦 ${totalItens} ${totalItens===1?'modelo':'modelos'}${modelosPreview?` · ${modelosPreview}${totalItens>2?'…':''}`:''}</div>
+                            </div>`;
+                        }).join('')}
+                    </div>
+                </div>`;
             });
             html += '</div>';
             document.getElementById('producao-loja-kanban').innerHTML = html;
@@ -2736,27 +3624,94 @@
         function detalheLoteModal(id) {
             const lote = loadStorage('cbcrm_producao_loja').find(l => l.id === id);
             if (!lote) return;
-
             currentDetailId = id;
             currentDetailType = 'lote';
-
-            const loja = loadStorage('cbcrm_lojas').find(l => l.id === lote.loja_id);
-            const nomeLote = `${loja.nome} - ${formatDate(lote.data_criacao)}`;
-
-            let html = `<p><strong>Loja:</strong> ${loja.nome}</p>`;
-            html += `<p><strong>Data:</strong> ${formatDate(lote.data_criacao)}</p>`;
-            html += '<p><strong>Modelos:</strong></p>';
-            html += '<table>';
-            html += '<thead><tr><th>Modelo</th><th>Feminina</th><th>Masculina</th><th>Observações</th></tr></thead>';
-            html += '<tbody>';
-            lote.modelos.forEach(m => {
-                html += `<tr><td>${m.modelo}</td><td>${m.qtd_feminina}</td><td>${m.qtd_masculina}</td><td>${m.obs}</td></tr>`;
-            });
-            html += '</tbody></table>';
-
-            document.getElementById('detalhe-lote-titulo').textContent = `Lote - ${nomeLote}`;
+            const lojaNome = getLojaNome(lote.loja_id);
+            const responsavelNome = getResponsavelNome(lote.responsavel_id);
+            const tipoLabel = (lote.tipo||'transparente') === 'personalizada' ? '🎨 Capas Personalizadas' : '🔲 Capas Transparentes';
+            const isPersonalizada = (lote.tipo||'transparente') === 'personalizada';
+            const stagesOpts = LOTE_STAGES.map(s =>
+                `<option value="${s.id}" ${s.id===lote.stage?'selected':''}>${s.icon} ${s.label}</option>`).join('');
+            let html = `
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;font-size:13px">
+                    <div><strong>Tipo:</strong> ${tipoLabel}</div>
+                    <div><strong>Data:</strong> ${formatDate(lote.data_criacao)}</div>
+                    <div><strong>Loja:</strong> ${lojaNome}</div>
+                    <div><strong>Responsável:</strong> ${responsavelNome||'—'}</div>
+                    <div><strong>Modelos:</strong> ${(lote.modelos||[]).length}</div>
+                </div>`;
+            if ((lote.modelos||[]).length > 0) {
+                if (isPersonalizada) {
+                    html += `<div style="font-weight:700;font-size:13px;margin-bottom:8px;color:#555">📋 Modelos</div>
+                    <table style="width:100%;border-collapse:collapse;font-size:12px;margin-bottom:12px">
+                        <thead><tr style="background:#f3e5f5;color:#6a1b9a">
+                            <th style="padding:7px 8px;text-align:left">Modelo</th>
+                            <th style="padding:7px 8px;text-align:left">Estampa</th>
+                            <th style="padding:7px 8px;text-align:center">Têm F</th>
+                            <th style="padding:7px 8px;text-align:center">Têm M</th>
+                            <th style="padding:7px 8px;text-align:center">Pedem F</th>
+                            <th style="padding:7px 8px;text-align:center">Pedem M</th>
+                            <th style="padding:7px 8px;text-align:left">Obs</th>
+                        </tr></thead><tbody>`;
+                    (lote.modelos||[]).forEach((m,i) => {
+                        html += `<tr style="background:${i%2===0?'#fff':'#fafafa'};border-bottom:1px solid #f0f0f0">
+                            <td style="padding:6px 8px;font-weight:600">${m.modelo}</td>
+                            <td style="padding:6px 8px">${m.estampa||'—'}</td>
+                            <td style="padding:6px 8px;text-align:center">${m.tem_fem||0}</td>
+                            <td style="padding:6px 8px;text-align:center">${m.tem_masc||0}</td>
+                            <td style="padding:6px 8px;text-align:center;color:#9C27B0;font-weight:600">${m.pedem_fem||0}</td>
+                            <td style="padding:6px 8px;text-align:center;color:#9C27B0;font-weight:600">${m.pedem_masc||0}</td>
+                            <td style="padding:6px 8px;color:#888;font-size:11px">${m.obs||'—'}</td>
+                        </tr>`;
+                    });
+                    html += '</tbody></table>';
+                } else {
+                    html += `<div style="font-weight:700;font-size:13px;margin-bottom:8px;color:#555">📋 Modelos</div>
+                    <table style="width:100%;border-collapse:collapse;font-size:12px;margin-bottom:12px">
+                        <thead><tr style="background:#e8eaf6;color:#1a237e">
+                            <th style="padding:7px 8px;text-align:left">Modelo</th>
+                            <th style="padding:7px 8px;text-align:center">Têm em casa</th>
+                            <th style="padding:7px 8px;text-align:center">Estão pedindo</th>
+                        </tr></thead><tbody>`;
+                    (lote.modelos||[]).forEach((m,i) => {
+                        html += `<tr style="background:${i%2===0?'#fff':'#fafafa'};border-bottom:1px solid #f0f0f0">
+                            <td style="padding:6px 8px;font-weight:600">${m.modelo}</td>
+                            <td style="padding:6px 8px;text-align:center">${m.tem||0}</td>
+                            <td style="padding:6px 8px;text-align:center;color:#1976D2;font-weight:600">${m.pedem||0}</td>
+                        </tr>`;
+                    });
+                    html += '</tbody></table>';
+                }
+            }
+            html += `<div style="margin-top:12px">
+                <label style="font-weight:600;font-size:13px">Estágio atual:</label>
+                <select onchange="moverLoteStage(this.value,'${id}')" style="width:100%;margin-top:4px;padding:8px;border:1px solid #ddd;border-radius:4px;font-size:13px">
+                    ${stagesOpts}
+                </select>
+            </div>`;
+            if ((lote.log||[]).length > 0) {
+                html += `<div style="margin-top:14px">
+                    <div style="font-weight:700;font-size:12px;color:#555;margin-bottom:6px">📜 Histórico</div>
+                    <div style="background:#f8f9fa;border-radius:6px;padding:10px;max-height:120px;overflow-y:auto">
+                        ${(lote.log||[]).map(e=>`<div style="font-size:11px;color:#444;margin-bottom:4px;padding-bottom:4px;border-bottom:1px solid #eee">${e.msg} <span style="color:#aaa">${e.ts?new Date(e.ts).toLocaleString('pt-BR'):''}</span></div>`).reverse().join('')}
+                    </div>
+                </div>`;
+            }
+            document.getElementById('detalhe-lote-titulo').textContent = `${tipoLabel} — ${lojaNome}`;
             document.getElementById('detalhe-lote-body').innerHTML = html;
             openModal('detalhe-lote-modal');
+        }
+
+        function moverLoteStage(newStage, id) {
+            let lotes = loadStorage('cbcrm_producao_loja');
+            const l = lotes.find(x => x.id === id);
+            if (!l) return;
+            const stageLabel = LOTE_STAGES.find(s=>s.id===newStage)?.label||newStage;
+            l.stage = newStage;
+            if (!l.log) l.log = [];
+            l.log.push({ msg: `🔄 Movido para: ${stageLabel}`, ts: ts() });
+            saveStorage('cbcrm_producao_loja', lotes);
+            renderProducaoLoja();
         }
 
         function deletarLote() {
@@ -2774,12 +3729,12 @@
         // =====================================================================
         async function salvarCliente(event) {
             event.preventDefault();
-            const editId = document.getElementById('cliente-edit-id')?.value || '';
+            const editId = (_modalEl('cliente-edit-id')||{}).value || '';
             const payload = {
-                nome:      document.getElementById('cliente-nome').value.trim(),
-                whatsapp:  document.getElementById('cliente-whatsapp').value.trim(),
-                email:     document.getElementById('cliente-email').value.trim(),
-                cpf:       document.getElementById('cliente-cpf').value.trim(),
+                nome:      (_modalEl('cliente-nome')||{value:''}).value.trim(),
+                whatsapp:  (_modalEl('cliente-whatsapp')||{value:''}).value.trim(),
+                email:     (_modalEl('cliente-email')||{value:''}).value.trim(),
+                cpf:       (_modalEl('cliente-cpf')||{value:''}).value.trim(),
             };
             let error;
             if (editId) {
@@ -2809,38 +3764,49 @@
                 grid.innerHTML = '<div class="empty-state">👥 Nenhum cliente encontrado</div>';
                 return;
             }
-            grid.innerHTML = lista.map(c => `
-                <div class="data-card" style="border-top:3px solid #FF9800">
-                    <div style="display:flex;justify-content:space-between;align-items:flex-start">
-                        <div>
-                            <div class="data-card-title">${c.nome}</div>
-                            ${c.cpf ? `<div class="data-card-sub">CPF: ${c.cpf}</div>` : ''}
-                        </div>
-                        <div style="display:flex;gap:5px">
-                            <button onclick="editarCliente('${c.id}')" title="Editar"
-                                style="background:#1a1d2e;color:#fff;border:none;border-radius:5px;padding:4px 8px;cursor:pointer;font-size:11px">✏️</button>
-                            <button onclick="deletarClienteById('${c.id}')"
-                                style="background:#f44336;color:#fff;border:none;border-radius:5px;padding:4px 8px;cursor:pointer;font-size:11px">🗑️</button>
-                        </div>
-                    </div>
-                    <div class="data-card-info">
-                        ${c.whatsapp ? `<div>📱 <a href="https://wa.me/55${c.whatsapp.replace(/\D/g,'')}" target="_blank" style="color:#25D366;font-weight:600;text-decoration:none">${c.whatsapp}</a></div>` : ''}
-                        ${c.email ? `<div>✉️ ${c.email}</div>` : ''}
-                    </div>
-                </div>
-            `).join('');
+            grid.innerHTML = `
+                <table style="width:100%;border-collapse:collapse;font-size:13px;background:#fff;border-radius:8px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.07)">
+                    <thead>
+                        <tr style="background:#1a1d2e;color:#fff">
+                            <th style="padding:10px 14px;text-align:left;font-weight:600">Nome</th>
+                            <th style="padding:10px 14px;text-align:left;font-weight:600">WhatsApp</th>
+                            <th style="padding:10px 14px;text-align:left;font-weight:600">CPF</th>
+                            <th style="padding:10px 14px;text-align:left;font-weight:600">E-mail</th>
+                            <th style="padding:10px 14px;text-align:center;font-weight:600">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${lista.map((c, i) => `
+                            <tr style="background:${i%2===0?'#fff':'#fafafa'};border-bottom:1px solid #f0f0f0;transition:background .15s" onmouseover="this.style.background='#fff8ee'" onmouseout="this.style.background='${i%2===0?'#fff':'#fafafa'}'">
+                                <td style="padding:10px 14px;font-weight:600;color:#1a1d2e">${c.nome}</td>
+                                <td style="padding:10px 14px">
+                                    ${c.whatsapp ? `<a href="https://wa.me/55${(c.whatsapp||'').replace(/\D/g,'')}" target="_blank" style="color:#25D366;font-weight:600;text-decoration:none">📱 ${c.whatsapp}</a>` : '<span style="color:#bbb">—</span>'}
+                                </td>
+                                <td style="padding:10px 14px;color:#555">${c.cpf || '<span style="color:#bbb">—</span>'}</td>
+                                <td style="padding:10px 14px;color:#555">${c.email || '<span style="color:#bbb">—</span>'}</td>
+                                <td style="padding:10px 14px;text-align:center">
+                                    <button onclick="editarCliente('${c.id}')" title="Editar"
+                                        style="background:#1a1d2e;color:#fff;border:none;border-radius:5px;padding:4px 10px;cursor:pointer;font-size:12px;margin-right:4px">✏️</button>
+                                    <button onclick="deletarClienteById('${c.id}')"
+                                        style="background:#f44336;color:#fff;border:none;border-radius:5px;padding:4px 10px;cursor:pointer;font-size:12px">🗑️</button>
+                                </td>
+                            </tr>`).join('')}
+                    </tbody>
+                </table>`;
         }
 
         function editarCliente(id) {
             const c = clientesCache.find(x => x.id === id);
             if (!c) return;
             openModal('novo-cliente-form');
-            document.getElementById('cliente-form-titulo').textContent = 'Editar Cliente';
-            document.getElementById('cliente-edit-id').value = id;
-            document.getElementById('cliente-nome').value    = c.nome || '';
-            document.getElementById('cliente-whatsapp').value = c.whatsapp || '';
-            document.getElementById('cliente-email').value  = c.email || '';
-            document.getElementById('cliente-cpf').value    = c.cpf || '';
+            setTimeout(() => {
+                const t = _modalEl('cliente-form-titulo'); if (t) t.textContent = 'Editar Cliente';
+                const e = _modalEl('cliente-edit-id');     if (e) e.value = id;
+                const n = _modalEl('cliente-nome');        if (n) n.value = c.nome || '';
+                const w = _modalEl('cliente-whatsapp');    if (w) w.value = c.whatsapp || '';
+                const em= _modalEl('cliente-email');       if (em) em.value = c.email || '';
+                const cp= _modalEl('cliente-cpf');         if (cp) cp.value = c.cpf || '';
+            }, 10);
         }
 
         async function deletarClienteById(id) {
@@ -2856,16 +3822,23 @@
         // =====================================================================
         async function salvarLoja(event) {
             event.preventDefault();
-            const editId = document.getElementById('loja-edit-id')?.value || '';
+            const editId = (_modalEl('loja-edit-id')||{}).value || '';
+            const emailLogin = ((_modalEl('loja-email-login')||{value:''}).value||'').trim().toLowerCase();
+            const senhaLogin = ((_modalEl('loja-senha-login')||{value:''}).value||'').trim();
             const payload = {
-                nome_fantasia: document.getElementById('loja-nome-fantasia').value.trim(),
-                razao_social:  document.getElementById('loja-razao-social').value.trim(),
-                cnpj:          document.getElementById('loja-cnpj').value.trim(),
-                telefone:      document.getElementById('loja-telefone').value.trim(),
-                endereco:      document.getElementById('loja-endereco').value.trim(),
-                cidade:        document.getElementById('loja-cidade').value.trim(),
-                estado:        document.getElementById('loja-estado').value.trim().toUpperCase(),
+                nome_fantasia: (_modalEl('loja-nome-fantasia')||{value:''}).value.trim(),
+                razao_social:  (_modalEl('loja-razao-social')||{value:''}).value.trim(),
+                cnpj:          (_modalEl('loja-cnpj')||{value:''}).value.trim(),
+                telefone:      (_modalEl('loja-telefone')||{value:''}).value.trim(),
+                endereco:      (_modalEl('loja-endereco')||{value:''}).value.trim(),
+                cidade:        (_modalEl('loja-cidade')||{value:''}).value.trim(),
+                estado:        (_modalEl('loja-estado')||{value:''}).value.trim().toUpperCase(),
             };
+            if (emailLogin) payload.email = emailLogin;
+            if (senhaLogin) {
+                if (senhaLogin.length < 6) { alert('A senha deve ter no mínimo 6 caracteres.'); return; }
+                payload.senha = await sha256(senhaLogin);
+            }
             let error;
             if (editId) {
                 ({ error } = await _sb.from('lojas').update(payload).eq('id', editId));
@@ -2916,15 +3889,19 @@
             const l = lojasCache.find(x => x.id === id);
             if (!l) return;
             openModal('nova-loja-form');
-            document.getElementById('loja-form-titulo').textContent  = 'Editar Loja';
-            document.getElementById('loja-edit-id').value            = id;
-            document.getElementById('loja-nome-fantasia').value      = l.nome_fantasia || '';
-            document.getElementById('loja-razao-social').value       = l.razao_social || '';
-            document.getElementById('loja-cnpj').value               = l.cnpj || '';
-            document.getElementById('loja-telefone').value           = l.telefone || '';
-            document.getElementById('loja-endereco').value           = l.endereco || '';
-            document.getElementById('loja-cidade').value             = l.cidade || '';
-            document.getElementById('loja-estado').value             = l.estado || '';
+            setTimeout(() => {
+                const t = _modalEl('loja-form-titulo');    if (t) t.textContent = 'Editar Loja';
+                const e = _modalEl('loja-edit-id');        if (e) e.value = id;
+                const nf= _modalEl('loja-nome-fantasia');  if (nf) nf.value = l.nome_fantasia || '';
+                const rs= _modalEl('loja-razao-social');   if (rs) rs.value = l.razao_social || '';
+                const cn= _modalEl('loja-cnpj');           if (cn) cn.value = l.cnpj || '';
+                const te= _modalEl('loja-telefone');       if (te) te.value = l.telefone || '';
+                const en= _modalEl('loja-endereco');       if (en) en.value = l.endereco || '';
+                const ci= _modalEl('loja-cidade');         if (ci) ci.value = l.cidade || '';
+                const es= _modalEl('loja-estado');         if (es) es.value = l.estado || '';
+                const em= _modalEl('loja-email-login');    if (em) em.value = l.email || '';
+                // senha left blank intentionally (never show existing hash)
+            }, 10);
         }
 
         async function deletarLojaById(id) {
@@ -2941,9 +3918,8 @@
         async function abrirEquipeLoja(lojaId) {
             const loja = lojasCache.find(l => l.id === lojaId);
             if (!loja) return;
-            const { data: funcs } = await _sb.from('funcionarios').select('*').eq('loja_id', lojaId).order('nome');
+            const { data: funcs } = await _sb.from('funcionarios').select('id,nome,cargo,ativo').eq('loja_id', lojaId).order('nome');
             const lista = funcs || [];
-            const roleColor = { gerente:'#FF9800', vendedor:'#2196F3', caixa:'#4CAF50' };
             const html = `
             <div>
                 <div class="modal-header">
@@ -2951,48 +3927,43 @@
                     <button class="modal-close" onclick="_fecharModal()">×</button>
                 </div>
                 <div class="modal-body">
+                    <p style="font-size:12px;color:#888;margin-bottom:12px">Funcionários cadastrados ficam disponíveis para seleção como Responsável nos pedidos.</p>
                     <div style="display:flex;justify-content:flex-end;margin-bottom:14px">
                         <button class="btn btn-small" onclick="document.getElementById('form-novo-func').style.display='block';this.style.display='none'">➕ Novo Funcionário</button>
                     </div>
-                    <!-- Formulário novo funcionário -->
                     <div id="form-novo-func" style="display:none;background:#f8f9fa;border-radius:8px;padding:16px;margin-bottom:16px">
                         <h4 style="margin-bottom:12px;color:#1a1d2e">Novo Funcionário</h4>
                         <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-                            <div class="form-group"><label>Nome</label><input type="text" id="func-nome" placeholder="Nome completo"></div>
-                            <div class="form-group"><label>E-mail</label><input type="email" id="func-email" placeholder="email@exemplo.com"></div>
-                            <div class="form-group"><label>Senha</label><input type="password" id="func-senha" placeholder="Senha de acesso"></div>
-                            <div class="form-group"><label>Função</label>
-                                <select id="func-funcao">
-                                    <option value="vendedor">Vendedor</option>
-                                    <option value="caixa">Caixa</option>
-                                    <option value="gerente">Gerente</option>
+                            <div class="form-group"><label>Nome *</label><input type="text" id="func-nome" placeholder="Nome completo"></div>
+                            <div class="form-group"><label>Cargo</label>
+                                <select id="func-cargo">
+                                    <option value="Vendedor">Vendedor</option>
+                                    <option value="Caixa">Caixa</option>
+                                    <option value="Gerente">Gerente</option>
+                                    <option value="Técnico">Técnico</option>
                                 </select>
                             </div>
                         </div>
-                        <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:6px">
+                        <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px">
                             <button class="btn btn-secondary btn-small" onclick="document.getElementById('form-novo-func').style.display='none'">Cancelar</button>
                             <button class="btn btn-small" onclick="salvarFuncionario('${lojaId}')">Salvar</button>
                         </div>
                     </div>
-                    <!-- Lista de funcionários -->
                     <div id="func-lista">
                     ${lista.length === 0
                         ? '<div class="empty-state" style="padding:20px">Nenhum funcionário cadastrado</div>'
                         : lista.map(f => `
-                            <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:#f8f9fa;border-radius:8px;margin-bottom:8px;border-left:3px solid ${roleColor[f.funcao]||'#ddd'}">
+                            <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:#f8f9fa;border-radius:8px;margin-bottom:8px;border-left:3px solid #FF9800">
                                 <div>
                                     <div style="font-weight:700;font-size:14px">${f.nome}</div>
-                                    <div style="font-size:12px;color:#666">${f.email}</div>
-                                    <div style="margin-top:3px;display:flex;gap:6px;align-items:center">
-                                        <span style="background:${roleColor[f.funcao]||'#607D8B'};color:#fff;padding:1px 8px;border-radius:10px;font-size:10px;font-weight:700">${f.funcao}</span>
-                                        <span style="font-size:10px;color:${f.ativo?'#4CAF50':'#f44336'};font-weight:600">${f.ativo?'● Ativo':'● Inativo'}</span>
+                                    <div style="margin-top:3px">
+                                        <span style="background:#1a1d2e;color:#fff;padding:1px 8px;border-radius:10px;font-size:10px;font-weight:700">${f.cargo||'Vendedor'}</span>
+                                        <span style="font-size:10px;color:${f.ativo?'#4CAF50':'#f44336'};font-weight:600;margin-left:6px">${f.ativo?'● Ativo':'● Inativo'}</span>
                                     </div>
                                 </div>
                                 <div style="display:flex;gap:5px;flex-shrink:0">
                                     <button onclick="toggleFuncionario('${f.id}','${lojaId}',${f.ativo})"
                                         style="background:${f.ativo?'#607D8B':'#4CAF50'};color:#fff;border:none;border-radius:4px;padding:4px 8px;cursor:pointer;font-size:11px">${f.ativo?'Desativar':'Ativar'}</button>
-                                    <button onclick="resetarSenha('${f.id}','${lojaId}')"
-                                        style="background:#FF9800;color:#fff;border:none;border-radius:4px;padding:4px 8px;cursor:pointer;font-size:11px">🔑</button>
                                     <button onclick="deletarFuncionario('${f.id}','${lojaId}')"
                                         style="background:#f44336;color:#fff;border:none;border-radius:4px;padding:4px 8px;cursor:pointer;font-size:11px">🗑️</button>
                                 </div>
@@ -3005,34 +3976,26 @@
         }
 
         async function salvarFuncionario(lojaId) {
-            const nome   = (document.getElementById('func-nome')?.value||'').trim();
-            const email  = (document.getElementById('func-email')?.value||'').trim();
-            const senha  = document.getElementById('func-senha')?.value||'';
-            const funcao = document.getElementById('func-funcao')?.value||'vendedor';
-            if (!nome||!email||!senha) { alert('Preencha todos os campos.'); return; }
-            const senhaHash = await sha256(senha);
-            const { error } = await _sb.from('funcionarios').insert([{ nome, email, senha: senhaHash, loja_id: lojaId, funcao }]);
+            const nome  = (document.getElementById('func-nome')?.value||'').trim();
+            const cargo = document.getElementById('func-cargo')?.value||'Vendedor';
+            if (!nome) { alert('Digite o nome do funcionário.'); return; }
+            const { error } = await _sb.from('funcionarios').insert([{ nome, cargo, loja_id: lojaId, ativo: true }]);
             if (error) { alert('Erro: ' + error.message); return; }
+            // Atualiza cache
+            await carregarFuncionariosCache();
             await abrirEquipeLoja(lojaId);
         }
 
         async function toggleFuncionario(funcId, lojaId, ativo) {
             await _sb.from('funcionarios').update({ ativo: !ativo }).eq('id', funcId);
+            await carregarFuncionariosCache();
             await abrirEquipeLoja(lojaId);
-        }
-
-        async function resetarSenha(funcId, lojaId) {
-            const nova = prompt('Nova senha para este funcionário:');
-            if (!nova) return;
-            const hash = await sha256(nova);
-            const { error } = await _sb.from('funcionarios').update({ senha: hash }).eq('id', funcId);
-            if (error) { alert('Erro: ' + error.message); return; }
-            alert('Senha atualizada!');
         }
 
         async function deletarFuncionario(funcId, lojaId) {
             if (!confirm('Deletar este funcionário?')) return;
             await _sb.from('funcionarios').delete().eq('id', funcId);
+            await carregarFuncionariosCache();
             await abrirEquipeLoja(lojaId);
         }
 
@@ -3045,7 +4008,7 @@
             });
             const el = document.getElementById(sectionId);
             el.classList.add('active');
-            el.style.display = sectionId === 'capas' ? 'flex' : 'block';
+            el.style.display = ['capas','assistencia','garantia_produto','producao_loja'].includes(sectionId) ? 'flex' : 'block';
 
             document.querySelectorAll('.sidebar-link').forEach(a => a.classList.remove('active'));
             event.target.classList.add('active');
@@ -3080,23 +4043,38 @@
         }
 
         function renderDashboard() {
-            const capas = loadStorage('cbcrm_capas');
-            const assistencias = loadStorage('cbcrm_assistencia');
-            const garantias = loadStorage('cbcrm_garantia_produto');
+            let capas = loadStorage('cbcrm_capas');
+            let assistencias = loadStorage('cbcrm_assistencia');
+            let garantiasProd = loadStorage('cbcrm_garantia_produto');
+            let garantiasTela = loadStorage('cbcrm_garantia_tela');
+            // Filtro de acesso
+            if (currentSession && currentSession.loja_id) {
+                const lid = currentSession.loja_id;
+                capas = capas.filter(c => c.loja_id === lid);
+                assistencias = assistencias.filter(a => a.loja_id === lid);
+                garantiasProd = garantiasProd.filter(g => g.loja_id === lid);
+                garantiasTela = garantiasTela.filter(g => g.loja_id === lid);
+            }
+            const setEl = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+            setEl('total-pedidos', capas.length);
+            setEl('em-producao', capas.filter(c => c.stage === 'em_producao').length);
+            setEl('garantias-pendentes', garantiasProd.filter(g => g.stage !== 'encerrado').length);
+            setEl('total-assistencias', assistencias.length);
 
-            document.getElementById('total-pedidos').textContent = capas.length;
-            document.getElementById('em-producao').textContent = capas.filter(c => c.stage === 'producao').length;
-            document.getElementById('garantias-pendentes').textContent = garantias.filter(g => g.stage !== 'encerrado').length;
-            document.getElementById('total-assistencias').textContent = assistencias.length;
-
-            const pedidosHtml = capas.slice(-5).reverse().map(c => `
-                <div style="padding: 10px 0; border-bottom: 1px solid #eee;">
-                    <div><strong>${c.modelo}</strong> - ${c.qtd} un.</div>
-                    <div style="font-size: 12px; color: #666;">${getClienteNome(c.cliente_id)} | ${formatDate(c.data)}</div>
-                </div>
-            `).join('');
-
-            document.getElementById('dashboard-pedidos').innerHTML = pedidosHtml || '<p style="color: #999;">Nenhum pedido ainda</p>';
+            const pedidosEl = document.getElementById('dashboard-pedidos');
+            if (pedidosEl) {
+                const pedidosHtml = capas.slice(-5).reverse().map(c => {
+                    const itens = c.itens||[];
+                    const prodDesc = itens.length > 0
+                        ? [...new Set(itens.map(i=>i.produto==='Outros'?(i.produto_outros||'Outros'):i.produto))].join(', ')
+                        : (c.produto||'Capa');
+                    return `<div style="padding:10px 0;border-bottom:1px solid #eee">
+                        <div><strong>${prodDesc}</strong> <span style="font-size:11px;color:#888">— ${c.num_os||''}</span></div>
+                        <div style="font-size:12px;color:#666">${getClienteNome(c.cliente_id)} | ${formatDate(c.data)}</div>
+                    </div>`;
+                }).join('');
+                pedidosEl.innerHTML = pedidosHtml || '<p style="color: #999;">Nenhum pedido ainda</p>';
+            }
         }
 
         // DRAG AND DROP
@@ -3232,12 +4210,15 @@
                 const assistencia = loadStorage('cbcrm_assistencia').find(a => a.id === currentDetailId);
                 content = `
                     <h3>OS Assistência Técnica</h3>
-                    <p><strong>OS:</strong> ${currentDetailId.substr(0, 8)}</p>
+                    <p><strong>OS:</strong> ${assistencia.num_os||currentDetailId.substr(0,8)}</p>
                     <p><strong>Cliente:</strong> ${getClienteNome(assistencia.cliente_id)}</p>
                     <p><strong>Loja:</strong> ${getLojaNome(assistencia.loja_id)}</p>
-                    <p><strong>Descrição:</strong> ${assistencia.descricao}</p>
-                    <p><strong>Valor:</strong> ${formatMoney(assistencia.valor)}</p>
+                    <p><strong>Modelo:</strong> ${assistencia.modelo||'—'} ${assistencia.cor?'/ '+assistencia.cor:''}</p>
+                    <p><strong>IMEI:</strong> ${assistencia.imei||'—'}</p>
+                    <p><strong>Problema:</strong> ${assistencia.descricao}</p>
+                    <p><strong>Condições Externas:</strong> ${assistencia.condicoes||'—'}</p>
                     <p><strong>Data:</strong> ${formatDate(assistencia.data)}</p>
+                    ${assistencia.prazo?`<p><strong>Prazo:</strong> ${assistencia.prazo}</p>`:''}
                 `;
             } else if (tipo === 'garantia_produto') {
                 const garantia = loadStorage('cbcrm_garantia_produto').find(g => g.id === currentDetailId);
@@ -3262,26 +4243,65 @@
                 `;
             } else if (tipo === 'lote') {
                 const lote = loadStorage('cbcrm_producao_loja').find(l => l.id === currentDetailId);
-                const loja = loadStorage('cbcrm_lojas').find(l => l.id === lote.loja_id);
+                const lojaNome = getLojaNome(lote.loja_id);
+                const isPersonalizada = (lote.tipo||'transparente') === 'personalizada';
+                const tipoLabel = isPersonalizada ? 'Capas Personalizadas' : 'Capas Transparentes';
+                const responsavelNome = getResponsavelNome(lote.responsavel_id);
+                let modelsTable = '';
+                if (isPersonalizada) {
+                    modelsTable = `<table border="1" style="margin:12px 0;border-collapse:collapse;width:100%;font-size:12px">
+                        <thead><tr style="background:#f3e5f5;color:#6a1b9a">
+                            <th style="padding:8px;text-align:left">Modelo</th>
+                            <th style="padding:8px;text-align:left">Estampa</th>
+                            <th style="padding:8px;text-align:center">Têm Fem</th>
+                            <th style="padding:8px;text-align:center">Têm Masc</th>
+                            <th style="padding:8px;text-align:center;color:#9C27B0">Pedem Fem</th>
+                            <th style="padding:8px;text-align:center;color:#9C27B0">Pedem Masc</th>
+                            <th style="padding:8px;text-align:left">Obs</th>
+                        </tr></thead><tbody>`;
+                    (lote.modelos||[]).forEach((m,i) => {
+                        modelsTable += `<tr style="background:${i%2===0?'#fff':'#fdf5ff'}">
+                            <td style="padding:8px;font-weight:600">${m.modelo}</td>
+                            <td style="padding:8px">${m.estampa||'—'}</td>
+                            <td style="padding:8px;text-align:center">${m.tem_fem||0}</td>
+                            <td style="padding:8px;text-align:center">${m.tem_masc||0}</td>
+                            <td style="padding:8px;text-align:center;font-weight:700;color:#9C27B0">${m.pedem_fem||0}</td>
+                            <td style="padding:8px;text-align:center;font-weight:700;color:#9C27B0">${m.pedem_masc||0}</td>
+                            <td style="padding:8px;font-size:11px;color:#666">${m.obs||'—'}</td>
+                        </tr>`;
+                    });
+                    modelsTable += '</tbody></table>';
+                } else {
+                    modelsTable = `<table border="1" style="margin:12px 0;border-collapse:collapse;width:100%;font-size:12px">
+                        <thead><tr style="background:#e8eaf6;color:#1a237e">
+                            <th style="padding:8px;text-align:left">Modelo</th>
+                            <th style="padding:8px;text-align:center">Têm em Casa</th>
+                            <th style="padding:8px;text-align:center;color:#1976D2">Estão Pedindo</th>
+                        </tr></thead><tbody>`;
+                    (lote.modelos||[]).forEach((m,i) => {
+                        modelsTable += `<tr style="background:${i%2===0?'#fff':'#f5f5f5'}">
+                            <td style="padding:8px;font-weight:600">${m.modelo}</td>
+                            <td style="padding:8px;text-align:center">${m.tem||0}</td>
+                            <td style="padding:8px;text-align:center;font-weight:700;color:#1976D2">${m.pedem||0}</td>
+                        </tr>`;
+                    });
+                    modelsTable += '</tbody></table>';
+                }
                 content = `
-                    <h3>Lote de Produção</h3>
-                    <p><strong>Loja:</strong> ${loja.nome}</p>
-                    <p><strong>Data:</strong> ${formatDate(lote.data_criacao)}</p>
-                    <table border="1" style="margin: 15px 0; border-collapse: collapse; width: 100%;">
-                        <thead>
-                            <tr style="background: #f5f5f5;">
-                                <th style="padding: 8px;">Modelo</th>
-                                <th style="padding: 8px;">Feminina</th>
-                                <th style="padding: 8px;">Masculina</th>
-                                <th style="padding: 8px;">Observações</th>
-                            </tr>
-                        </thead>
-                        <tbody>
+                    <div style="border:3px solid #1a1d2e;border-radius:8px;padding:10px 14px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center">
+                        <div>
+                            <div style="font-size:10px;color:#888;text-transform:uppercase;font-weight:600">Pedido de Produção</div>
+                            <div style="font-size:20px;font-weight:900;color:${isPersonalizada?'#9C27B0':'#1a1d2e'}">${tipoLabel}</div>
+                        </div>
+                        <div style="text-align:right">
+                            <div style="font-size:11px;color:#555"><strong>Data:</strong> ${formatDate(lote.data_criacao)}</div>
+                            <div style="font-size:11px;color:#555"><strong>Total modelos:</strong> ${(lote.modelos||[]).length}</div>
+                        </div>
+                    </div>
+                    <p><strong>Loja:</strong> ${lojaNome}</p>
+                    <p><strong>Responsável:</strong> ${responsavelNome||'—'}</p>
+                    ${modelsTable}
                 `;
-                lote.modelos.forEach(m => {
-                    content += `<tr><td style="padding: 8px;">${m.modelo}</td><td style="padding: 8px;">${m.qtd_feminina}</td><td style="padding: 8px;">${m.qtd_masculina}</td><td style="padding: 8px;">${m.obs}</td></tr>`;
-                });
-                content += '</tbody></table>';
             }
 
             window.printContent = content;
@@ -3342,13 +4362,18 @@
             const saved = localStorage.getItem('cbcrm_session');
             if (saved) {
                 try {
-                    currentSession = JSON.parse(saved);
-                    // Valida se funcionário ainda está ativo
-                    const { data } = await _sb.from('funcionarios')
-                        .select('ativo').eq('id', currentSession.id).maybeSingle();
-                    if (data && data.ativo) {
-                        await iniciarApp();
-                        return;
+                    const sess = JSON.parse(saved);
+                    // Sessão no novo formato (loja_id + email)
+                    if (sess && sess.loja_id && sess.email) {
+                        const { data } = await _sb.from('lojas')
+                            .select('id, nome_fantasia, email')
+                            .eq('id', sess.loja_id)
+                            .maybeSingle();
+                        if (data) {
+                            currentSession = { loja_id: data.id, loja_nome: data.nome_fantasia, email: data.email };
+                            await iniciarApp();
+                            return;
+                        }
                     }
                 } catch(e) {}
                 localStorage.removeItem('cbcrm_session');
