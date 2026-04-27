@@ -713,19 +713,34 @@
 
                 <!-- GARANTIA DE TELA SECTION -->
                 <div id="garantia_tela" class="section">
-                    <div class="button-group">
-                        <button class="btn" onclick="openModal('nova-garantia-tela-form')">➕ Nova Garantia</button>
-                        <input type="text" id="garantia-tela-busca" placeholder="🔍 Buscar por cliente ou modelo..."
-                            oninput="renderGarantiaTela()"
-                            style="padding:8px 14px;border:1.5px solid #ddd;border-radius:6px;font-size:13px;width:260px;outline:none"
-                            onfocus="this.style.borderColor='#FF9800'" onblur="this.style.borderColor='#ddd'">
-                        <div style="display:flex;gap:8px;align-items:center;margin-left:8px;font-size:12px">
-                            <span style="background:#4CAF50;color:#fff;padding:2px 10px;border-radius:10px">● Válida</span>
-                            <span style="background:#FF9800;color:#fff;padding:2px 10px;border-radius:10px">● Vence em 30d</span>
-                            <span style="background:#f44336;color:#fff;padding:2px 10px;border-radius:10px">● Vencida</span>
+                    <!-- Barra de ferramentas -->
+                    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px">
+                        <div style="position:relative;flex:1;min-width:220px;max-width:380px">
+                            <span style="position:absolute;left:10px;top:50%;transform:translateY(-50%);color:#aaa;font-size:15px">🔍</span>
+                            <input type="text" id="garantia-tela-busca" placeholder="Buscar por cliente ou modelo..."
+                                oninput="renderGarantiaTela()"
+                                style="width:100%;padding:9px 12px 9px 34px;border:1.5px solid #ddd;border-radius:6px;font-size:13px;outline:none;color:#333"
+                                onfocus="this.style.borderColor='#FF9800'" onblur="this.style.borderColor='#ddd'">
                         </div>
+                        <select id="gt-status-filtro" onchange="renderGarantiaTela()"
+                            style="padding:9px 12px;border:1.5px solid #ddd;border-radius:6px;font-size:13px;color:#333;background:#fff;cursor:pointer;outline:none">
+                            <option value="todos">Todos os status</option>
+                            <option value="valida">✅ Válidas</option>
+                            <option value="vence30">⚠️ Vence em 30d</option>
+                            <option value="vencida">❌ Vencidas</option>
+                        </select>
+                        <select id="gt-ordem" onchange="renderGarantiaTela()"
+                            style="padding:9px 12px;border:1.5px solid #ddd;border-radius:6px;font-size:13px;color:#333;background:#fff;cursor:pointer;outline:none">
+                            <option value="vencimento">Próximo vencimento</option>
+                            <option value="nome">Nome A-Z</option>
+                            <option value="instalacao">↓ Data instalação</option>
+                        </select>
+                        <button class="btn" onclick="openModal('nova-garantia-tela-form')" style="white-space:nowrap">➕ Nova Garantia</button>
                     </div>
-                    <div id="garantia-tela-grid" class="cards-grid"></div>
+                    <!-- Stat bar -->
+                    <div id="gt-stat-bar" style="display:flex;align-items:center;gap:12px;margin-bottom:12px;flex-wrap:wrap;font-size:12px"></div>
+                    <!-- Tabela -->
+                    <div id="garantia-tela-grid"></div>
                 </div>
 
                 <!-- PRODUÇÃO LOJA SECTION -->
@@ -755,14 +770,27 @@
 
                 <!-- CLIENTES SECTION -->
                 <div id="clientes" class="section">
-                    <div class="button-group">
-                        <input type="text" id="clientes-search" placeholder="🔍 Buscar cliente..."
-                            oninput="renderClientes()"
-                            style="padding:8px 14px;border:1.5px solid #ddd;border-radius:6px;font-size:14px;width:260px;outline:none"
-                            onfocus="this.style.borderColor='#FF9800'" onblur="this.style.borderColor='#ddd'">
-                        <button class="btn" onclick="openModal('novo-cliente-form')">➕ Novo Cliente</button>
+                    <!-- Barra de ferramentas -->
+                    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px">
+                        <div style="position:relative;flex:1;min-width:240px;max-width:400px">
+                            <span style="position:absolute;left:10px;top:50%;transform:translateY(-50%);color:#aaa;font-size:15px">🔍</span>
+                            <input type="text" id="clientes-search" placeholder="Pesquise por nome, CPF, e-mail ou WhatsApp..."
+                                oninput="renderClientes()"
+                                style="width:100%;padding:9px 12px 9px 34px;border:1.5px solid #ddd;border-radius:6px;font-size:13px;outline:none;color:#333"
+                                onfocus="this.style.borderColor='#FF9800'" onblur="this.style.borderColor='#ddd'">
+                        </div>
+                        <select id="clientes-ordem" onchange="renderClientes()"
+                            style="padding:9px 12px;border:1.5px solid #ddd;border-radius:6px;font-size:13px;color:#333;background:#fff;cursor:pointer;outline:none">
+                            <option value="nome">↑ Nome A-Z</option>
+                            <option value="nome-desc">↓ Nome Z-A</option>
+                            <option value="recente">Mais recentes</option>
+                        </select>
+                        <button class="btn" onclick="openModal('novo-cliente-form')" style="white-space:nowrap">➕ Incluir Cadastro</button>
                     </div>
-                    <div id="clientes-grid" class="cards-grid"></div>
+                    <!-- Barra de contagem -->
+                    <div id="clientes-stat-bar" style="display:flex;align-items:center;gap:16px;margin-bottom:10px;font-size:13px;color:#555"></div>
+                    <!-- Tabela -->
+                    <div id="clientes-grid"></div>
                 </div>
 
                 <!-- LOJAS SECTION -->
@@ -1280,23 +1308,6 @@
                     <div id="modelos-container"></div>
                     <button type="button" class="btn btn-secondary" style="margin-top:8px" onclick="adicionarModelo()">+ Adicionar Item</button>
                 </div>
-                <!-- Credenciais de Login -->
-                <div style="background:#e8f5e9;border:1px solid #a5d6a7;border-radius:8px;padding:14px;margin-bottom:12px">
-                    <div style="font-weight:700;font-size:12px;color:#2e7d32;margin-bottom:10px">🔐 Credenciais de Login (opcional)</div>
-                    <p style="font-size:11px;color:#555;margin-bottom:10px">Defina o e-mail e senha que a loja usará para acessar o CRM. A senha só é atualizada se preenchida.</p>
-                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-                        <div class="form-group" style="margin:0">
-                            <label style="font-size:12px">E-mail de Acesso</label>
-                            <input type="email" id="loja-email-login" placeholder="loja@email.com"
-                                style="width:100%;padding:8px;border:1px solid #a5d6a7;border-radius:4px;font-size:13px">
-                        </div>
-                        <div class="form-group" style="margin:0">
-                            <label style="font-size:12px">Nova Senha (deixe em branco para manter)</label>
-                            <input type="password" id="loja-senha-login" placeholder="Mínimo 6 caracteres"
-                                style="width:100%;padding:8px;border:1px solid #a5d6a7;border-radius:4px;font-size:13px">
-                        </div>
-                    </div>
-                </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancelar</button>
                     <button type="submit" class="btn">Salvar</button>
@@ -1329,9 +1340,12 @@
         <div class="modal-body">
             <form onsubmit="salvarCliente(event)">
                 <input type="hidden" id="cliente-edit-id">
+
+                <!-- Dados pessoais -->
+                <div style="font-weight:700;font-size:12px;color:#FF9800;text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">👤 Dados Pessoais</div>
                 <div class="form-group">
-                    <label>Nome *</label>
-                    <input type="text" id="cliente-nome" required>
+                    <label>Nome completo *</label>
+                    <input type="text" id="cliente-nome" required placeholder="Ex: João da Silva">
                 </div>
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
                     <div class="form-group">
@@ -1345,8 +1359,51 @@
                 </div>
                 <div class="form-group">
                     <label>E-mail</label>
-                    <input type="email" id="cliente-email">
+                    <input type="email" id="cliente-email" placeholder="email@exemplo.com">
                 </div>
+
+                <!-- Endereço -->
+                <div style="font-weight:700;font-size:12px;color:#FF9800;text-transform:uppercase;letter-spacing:.5px;margin:16px 0 10px">📍 Endereço</div>
+                <div style="display:grid;grid-template-columns:160px 1fr;gap:12px">
+                    <div class="form-group">
+                        <label>CEP</label>
+                        <div style="position:relative">
+                            <input type="text" id="cliente-cep" placeholder="00000-000" maxlength="9"
+                                oninput="mascararCep(this)" onblur="buscarCep(this.value)"
+                                style="width:100%;padding:10px;border:1px solid #ddd;border-radius:4px;font-size:14px">
+                            <span id="cliente-cep-spinner" style="display:none;position:absolute;right:8px;top:50%;transform:translateY(-50%);font-size:14px">⏳</span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Logradouro</label>
+                        <input type="text" id="cliente-endereco" placeholder="Rua / Av. / Travessa...">
+                    </div>
+                </div>
+                <div style="display:grid;grid-template-columns:100px 1fr 1fr;gap:12px">
+                    <div class="form-group">
+                        <label>Número</label>
+                        <input type="text" id="cliente-numero" placeholder="Ex: 227">
+                    </div>
+                    <div class="form-group">
+                        <label>Complemento</label>
+                        <input type="text" id="cliente-complemento" placeholder="Apto, Bloco, Casa...">
+                    </div>
+                    <div class="form-group">
+                        <label>Bairro</label>
+                        <input type="text" id="cliente-bairro" placeholder="Bairro">
+                    </div>
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 80px;gap:12px">
+                    <div class="form-group">
+                        <label>Cidade</label>
+                        <input type="text" id="cliente-cidade" placeholder="Cidade">
+                    </div>
+                    <div class="form-group">
+                        <label>Estado</label>
+                        <input type="text" id="cliente-estado" placeholder="SC" maxlength="2">
+                    </div>
+                </div>
+
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancelar</button>
                     <button type="submit" class="btn">Salvar</button>
@@ -1394,6 +1451,23 @@
                     <div class="form-group">
                         <label>Estado</label>
                         <input type="text" id="loja-estado" placeholder="SC" maxlength="2">
+                    </div>
+                </div>
+                <!-- Credenciais de Acesso -->
+                <div style="background:#e8f5e9;border:1px solid #a5d6a7;border-radius:8px;padding:14px;margin-bottom:12px">
+                    <div style="font-weight:700;font-size:13px;color:#2e7d32;margin-bottom:6px">🔐 Credenciais de Acesso ao CRM</div>
+                    <p style="font-size:11px;color:#555;margin-bottom:10px">E-mail e senha que o responsável da loja usará para entrar no sistema. A senha só é atualizada se preenchida ao editar.</p>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+                        <div class="form-group" style="margin:0">
+                            <label style="font-size:12px">E-mail de Acesso *</label>
+                            <input type="email" id="loja-email-login" placeholder="loja@email.com" required
+                                style="width:100%;padding:8px;border:1px solid #a5d6a7;border-radius:4px;font-size:13px">
+                        </div>
+                        <div class="form-group" style="margin:0">
+                            <label style="font-size:12px" id="loja-senha-label">Senha *</label>
+                            <input type="password" id="loja-senha-login" placeholder="Mínimo 6 caracteres"
+                                style="width:100%;padding:8px;border:1px solid #a5d6a7;border-radius:4px;font-size:13px">
+                        </div>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -1702,6 +1776,52 @@
             const mc = document.getElementById('modal-content');
             if (mc) { const el = mc.querySelector('[id="' + id + '"]'); if (el) return el; }
             return document.getElementById(id);
+        }
+
+        // Valida se um cliente foi selecionado no dropdown.
+        // Se o campo de busca tem texto mas o hidden está vazio, tenta auto-selecionar:
+        //   1. Correspondência exata de nome (case-insensitive)
+        //   2. Correspondência parcial se houver exatamente 1 resultado
+        // Retorna true se OK, false + destaca campo se inválido.
+        function _validarCliente(prefixo) {
+            const campoId  = _modalEl(prefixo + '-cliente-id');
+            const campoSrc = _modalEl(prefixo + '-cliente-search');
+            let clienteId = campoId ? (campoId.value || '') : '';
+
+            if (!clienteId && campoSrc && campoSrc.value.trim()) {
+                const texto = campoSrc.value.trim().toLowerCase();
+                // 1. Tenta correspondência exata
+                let match = clientesCache.filter(c => (c.nome||'').toLowerCase() === texto);
+                // 2. Se não achar exato, tenta parcial (só auto-seleciona se houver 1 único resultado)
+                if (match.length === 0) {
+                    match = clientesCache.filter(c => (c.nome||'').toLowerCase().includes(texto));
+                }
+                if (match.length === 1) {
+                    if (campoId) campoId.value = match[0].id;
+                    if (campoSrc) campoSrc.value = match[0].nome; // normaliza o nome exibido
+                    clienteId = match[0].id;
+                }
+            }
+
+            if (!clienteId) {
+                if (campoSrc) {
+                    campoSrc.style.border = '2px solid #f44336';
+                    campoSrc.style.background = '#fff5f5';
+                    campoSrc.placeholder = 'Selecione um cliente da lista!';
+                    try { campoSrc.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch(e) {}
+                    campoSrc.focus();
+                    setTimeout(function() {
+                        var el = _modalEl(prefixo + '-cliente-search');
+                        if (el) {
+                            el.style.border = '';
+                            el.style.background = '';
+                            el.placeholder = 'Digite o nome do cliente...';
+                        }
+                    }, 3500);
+                }
+                return false;
+            }
+            return true;
         }
 
         // UTILITIES
@@ -2630,16 +2750,18 @@
 
         // ASSISTÊNCIA TÉCNICA
         function handleAssistFotos(event) {
-            const files = Array.from(event.target.files).slice(0, 10);
-            assistFotosBase64 = [];
+            const novos = Array.from(event.target.files);
+            if (!novos.length) return;
+            const disponiveis = 10 - assistFotosBase64.length;
+            if (disponiveis <= 0) { alert('Limite de 10 fotos atingido.'); return; }
+            const arquivos = novos.slice(0, disponiveis);
             let loaded = 0;
-            if (!files.length) return;
-            files.forEach(file => {
+            arquivos.forEach(file => {
                 const reader = new FileReader();
                 reader.onload = (e) => {
                     assistFotosBase64.push(e.target.result);
                     loaded++;
-                    if (loaded === files.length) renderAssistGallery();
+                    if (loaded === arquivos.length) renderAssistGallery();
                 };
                 reader.readAsDataURL(file);
             });
@@ -2678,8 +2800,8 @@
 
         function salvarAssistencia(event) {
             event.preventDefault();
+            if (!_validarCliente('assist')) return;
             const clienteId = (_modalEl('assist-cliente-id')||{}).value || '';
-            if (!clienteId) { alert('Selecione um cliente!'); return; }
             const editId = (_modalEl('assist-edit-id')||{}).value || '';
             const assistencias = loadStorage('cbcrm_assistencia');
             if (editId) {
@@ -2807,11 +2929,19 @@
 
         function dropAssist(event, newStage) {
             event.preventDefault();
+            document.querySelectorAll('.kanban-cards').forEach(c => c.classList.remove('drag-over'));
             const id = event.dataTransfer.getData('assist-id');
             let assistencias = loadStorage('cbcrm_assistencia');
             const a = assistencias.find(x => x.id === id);
-            if (a) { a.stage = newStage; saveStorage('cbcrm_assistencia', assistencias); renderAssistencia(); }
-            document.querySelectorAll('.kanban-cards').forEach(c => c.classList.remove('drag-over'));
+            if (!a || a.stage === newStage) return;
+            const novoLabel = ASSIST_STAGES.find(s => s.id === newStage)?.label || newStage;
+            if (!confirm(`Mover esta OS para "${novoLabel}"?`)) return;
+            const stageLabel = ASSIST_STAGES.find(s=>s.id===newStage)?.label||newStage;
+            a.stage = newStage;
+            if (!a.log) a.log = [];
+            a.log.push({ msg: `🔄 Movido para: ${stageLabel}`, ts: ts() });
+            saveStorage('cbcrm_assistencia', assistencias);
+            renderAssistencia();
         }
 
         function detalheAssistenciaModal(id) {
@@ -2903,16 +3033,18 @@
 
         // GARANTIA DE PRODUTOS
         function handleGpFotos(event) {
-            const files = Array.from(event.target.files).slice(0,5);
-            gpFotosBase64 = [];
+            const novos = Array.from(event.target.files);
+            if (!novos.length) return;
+            const disponiveis = 10 - gpFotosBase64.length;
+            if (disponiveis <= 0) { alert('Limite de 10 fotos atingido.'); return; }
+            const arquivos = novos.slice(0, disponiveis);
             let loaded = 0;
-            if (!files.length) return;
-            files.forEach(file => {
+            arquivos.forEach(file => {
                 const reader = new FileReader();
                 reader.onload = (e) => {
                     gpFotosBase64.push(e.target.result);
                     loaded++;
-                    if (loaded === files.length) {
+                    if (loaded === arquivos.length) {
                         const g = _modalEl('gp-gallery');
                         if (g) g.innerHTML = gpFotosBase64.map(b=>`<img src="${b}" class="thumbnail">`).join('');
                     }
@@ -2958,8 +3090,8 @@
 
         function salvarGarantiaProduto(event) {
             event.preventDefault();
+            if (!_validarCliente('gp')) return;
             const clienteId = (_modalEl('gp-cliente-id')||{}).value || '';
-            if (!clienteId) { alert('Selecione um cliente!'); return; }
             const codigoProduto = ((_modalEl('gp-codigo')||{}).value || '').trim();
             if (!codigoProduto) { alert('O código do produto é obrigatório!'); return; }
             const editId = (_modalEl('gp-edit-id')||{}).value || '';
@@ -3162,16 +3294,18 @@
         }
 
         function handleGtFotos(event) {
-            const files = event.target.files;
-            gtFotosBase64 = [];
+            const novos = Array.from(event.target.files);
+            if (!novos.length) return;
+            const disponiveis = 10 - gtFotosBase64.length;
+            if (disponiveis <= 0) { alert('Limite de 10 fotos atingido.'); return; }
+            const arquivos = novos.slice(0, disponiveis);
             let loaded = 0;
-
-            Array.from(files).forEach(file => {
+            arquivos.forEach(file => {
                 const reader = new FileReader();
                 reader.onload = (e) => {
                     gtFotosBase64.push(e.target.result);
                     loaded++;
-                    if (loaded === files.length) renderGtGallery();
+                    if (loaded === arquivos.length) renderGtGallery();
                 };
                 reader.readAsDataURL(file);
             });
@@ -3200,8 +3334,8 @@
 
         function salvarGarantiaTela(event) {
             event.preventDefault();
+            if (!_validarCliente('gt')) return;
             const clienteId = (_modalEl('gt-cliente-id')||{}).value || '';
-            if (!clienteId) { alert('Selecione um cliente!'); return; }
             const editId = (_modalEl('gt-edit-id')||{}).value || '';
             const garantias = loadStorage('cbcrm_garantia_tela');
             if (editId) {
@@ -3257,82 +3391,124 @@
         }
 
         function renderGarantiaTela() {
-            let garantias = loadStorage('cbcrm_garantia_tela');
+            var garantias = loadStorage('cbcrm_garantia_tela');
             if (currentSession && currentSession.loja_id) {
-                garantias = garantias.filter(g => g.loja_id === currentSession.loja_id);
+                garantias = garantias.filter(function(g){ return g.loja_id === currentSession.loja_id; });
             }
-            const qGT = (document.getElementById('garantia-tela-busca')?.value||'').trim().toLowerCase();
+
+            function calcVenc(g) {
+                if (!g.data_instalacao || !g.prazo_dias) return null;
+                var d = new Date(g.data_instalacao + 'T00:00:00');
+                d.setDate(d.getDate() + Number(g.prazo_dias));
+                return d;
+            }
+            var hoje = new Date(); hoje.setHours(0,0,0,0);
+            function getDias(g) {
+                var v = calcVenc(g);
+                return v ? Math.round((v - hoje)/(1000*60*60*24)) : null;
+            }
+            function getStatus(g) {
+                var d = getDias(g);
+                if (d === null) return 'sem_prazo';
+                if (d < 0) return 'vencida';
+                if (d <= 30) return 'vence30';
+                return 'valida';
+            }
+
+            // Stat bar
+            var totalValidas  = garantias.filter(function(g){ return getStatus(g) === 'valida'; }).length;
+            var totalVence30  = garantias.filter(function(g){ return getStatus(g) === 'vence30'; }).length;
+            var totalVencidas = garantias.filter(function(g){ return getStatus(g) === 'vencida'; }).length;
+            var statBar = document.getElementById('gt-stat-bar');
+            if (statBar) {
+                statBar.innerHTML =
+                    '<span style="background:#1a1d2e;color:#fff;padding:4px 14px;border-radius:20px;font-weight:700;font-size:12px">Total: ' + garantias.length + '</span> ' +
+                    '<span style="background:#4CAF50;color:#fff;padding:4px 14px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer" onclick="document.getElementById(\'gt-status-filtro\').value=\'valida\';renderGarantiaTela()">Validas: ' + totalValidas + '</span> ' +
+                    '<span style="background:#FF9800;color:#fff;padding:4px 14px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer" onclick="document.getElementById(\'gt-status-filtro\').value=\'vence30\';renderGarantiaTela()">Vence 30d: ' + totalVence30 + '</span> ' +
+                    '<span style="background:#f44336;color:#fff;padding:4px 14px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer" onclick="document.getElementById(\'gt-status-filtro\').value=\'vencida\';renderGarantiaTela()">Vencidas: ' + totalVencidas + '</span>';
+            }
+
+            // Filtro busca
+            var qGT = ((document.getElementById('garantia-tela-busca')||{value:''}).value||'').trim().toLowerCase();
             if (qGT) {
-                garantias = garantias.filter(g =>
-                    getClienteNome(g.cliente_id).toLowerCase().includes(qGT) ||
-                    (g.modelo||'').toLowerCase().includes(qGT)
-                );
+                garantias = garantias.filter(function(g){
+                    return getClienteNome(g.cliente_id).toLowerCase().indexOf(qGT) >= 0 ||
+                           (g.modelo||'').toLowerCase().indexOf(qGT) >= 0;
+                });
             }
-            const grid = document.getElementById('garantia-tela-grid');
+
+            // Filtro status
+            var filtroStatus = (document.getElementById('gt-status-filtro')||{value:'todos'}).value || 'todos';
+            if (filtroStatus !== 'todos') {
+                garantias = garantias.filter(function(g){ return getStatus(g) === filtroStatus; });
+            }
+
+            // Ordenacao
+            var ordem = (document.getElementById('gt-ordem')||{value:'vencimento'}).value || 'vencimento';
+            if (ordem === 'vencimento') {
+                garantias.sort(function(a, b) {
+                    var va = calcVenc(a), vb = calcVenc(b);
+                    if (!va && !vb) return 0; if (!va) return 1; if (!vb) return -1;
+                    return va - vb;
+                });
+            } else if (ordem === 'nome') {
+                garantias.sort(function(a,b){ return getClienteNome(a.cliente_id).localeCompare(getClienteNome(b.cliente_id), 'pt-BR'); });
+            } else if (ordem === 'instalacao') {
+                garantias.sort(function(a,b){ return (b.data_instalacao||'').localeCompare(a.data_instalacao||''); });
+            }
+
+            var grid = document.getElementById('garantia-tela-grid');
             if (!grid) return;
             if (!garantias.length) {
-                grid.innerHTML = '<p style="color:#999;padding:20px;text-align:center">Nenhuma garantia cadastrada.</p>';
+                grid.innerHTML = '<div style="background:#fff;border-radius:8px;padding:40px;text-align:center;color:#999;box-shadow:0 1px 4px rgba(0,0,0,.06)">Nenhuma garantia encontrada.</div>';
                 return;
             }
-            // Ordenar: vencidas primeiro, depois por data de vencimento
-            const calcVenc = g => {
-                if (!g.data_instalacao || !g.prazo_dias) return null;
-                const d = new Date(g.data_instalacao + 'T00:00:00');
-                d.setDate(d.getDate() + g.prazo_dias);
-                return d;
-            };
-            garantias.sort((a, b) => {
-                const va = calcVenc(a), vb = calcVenc(b);
-                if (!va && !vb) return 0; if (!va) return 1; if (!vb) return -1;
-                return va - vb;
-            });
-            grid.innerHTML = `
-            <table style="width:100%;border-collapse:collapse;background:#fff;border-radius:10px;overflow:hidden;box-shadow:0 1px 6px rgba(0,0,0,.07)">
-                <thead>
-                    <tr style="background:#1a1d2e;color:#fff;font-size:12px">
-                        <th style="padding:11px 14px;text-align:left;font-weight:600">Cliente</th>
-                        <th style="padding:11px 14px;text-align:left;font-weight:600">Modelo</th>
-                        <th style="padding:11px 14px;text-align:left;font-weight:600">Instalação</th>
-                        <th style="padding:11px 14px;text-align:left;font-weight:600">Vencimento</th>
-                        <th style="padding:11px 14px;text-align:left;font-weight:600">Prazo</th>
-                        <th style="padding:11px 14px;text-align:left;font-weight:600">Status</th>
-                        <th style="padding:11px 14px;text-align:center;font-weight:600">Ações</th>
-                    </tr>
-                </thead>
-                <tbody>
-                ${garantias.map((g, idx) => {
-                    const venc = calcVenc(g);
-                    const vencStr = venc ? venc.toLocaleDateString('pt-BR') : '—';
-                    const hoje = new Date(); hoje.setHours(0,0,0,0);
-                    const dias = venc ? Math.round((venc - hoje)/(1000*60*60*24)) : null;
-                    let statusBadge = '<span style="color:#aaa">—</span>';
-                    let rowBg = idx % 2 === 0 ? '#fff' : '#f9f9f9';
-                    if (dias !== null) {
-                        if (dias < 0) {
-                            statusBadge = `<span style="background:#f44336;color:#fff;padding:2px 10px;border-radius:10px;font-size:11px;font-weight:700">● Vencida</span>`;
-                            rowBg = '#fff5f5';
-                        } else if (dias <= 30) {
-                            statusBadge = `<span style="background:#FF9800;color:#fff;padding:2px 10px;border-radius:10px;font-size:11px;font-weight:700">● ${dias}d restantes</span>`;
-                            rowBg = '#fffaf0';
-                        } else {
-                            statusBadge = `<span style="background:#4CAF50;color:#fff;padding:2px 10px;border-radius:10px;font-size:11px;font-weight:700">● Válida</span>`;
-                        }
-                    }
-                    return `<tr style="background:${rowBg};border-bottom:1px solid #eee"
-                        onmouseover="this.style.background='#f0f7ff'" onmouseout="this.style.background='${rowBg}'">
-                        <td style="padding:10px 14px;font-weight:600;font-size:13px;cursor:pointer" onclick="detalheGarantiaTelaModal('${g.id}')">${getClienteNome(g.cliente_id)}</td>
-                        <td style="padding:10px 14px;font-size:12px;color:#555;cursor:pointer" onclick="detalheGarantiaTelaModal('${g.id}')">📱 ${g.modelo}</td>
-                        <td style="padding:10px 14px;font-size:12px;color:#666;cursor:pointer" onclick="detalheGarantiaTelaModal('${g.id}')">${g.data_instalacao ? new Date(g.data_instalacao+'T00:00:00').toLocaleDateString('pt-BR') : '—'}</td>
-                        <td style="padding:10px 14px;font-size:12px;color:#666;cursor:pointer" onclick="detalheGarantiaTelaModal('${g.id}')">${vencStr}</td>
-                        <td style="padding:10px 14px;font-size:12px;color:#666;cursor:pointer" onclick="detalheGarantiaTelaModal('${g.id}')">${g.prazo_dias||'—'}d</td>
-                        <td style="padding:10px 14px;cursor:pointer" onclick="detalheGarantiaTelaModal('${g.id}')">${statusBadge}</td>
-                        <td style="padding:10px 14px;text-align:center">
-                            <button onclick="editarGarantiaTela('${g.id}')" style="font-size:11px;padding:4px 10px;background:#FF9800;color:#fff;border:none;border-radius:4px;cursor:pointer;font-weight:700">✏️ Editar</button>
-                        </td>
-                    </tr>`;
-                }).join('')}
-                </tbody>
-            </table>`;
+
+            var thead = '<table style="width:100%;border-collapse:collapse;font-size:13px">' +
+                '<thead><tr style="background:#FF9800;color:#fff">' +
+                '<th style="padding:12px 16px;text-align:left;font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.5px">Cliente</th>' +
+                '<th style="padding:12px 16px;text-align:left;font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.5px">Modelo</th>' +
+                '<th style="padding:12px 16px;text-align:left;font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.5px">Instalacao</th>' +
+                '<th style="padding:12px 16px;text-align:left;font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.5px">Vencimento</th>' +
+                '<th style="padding:12px 16px;text-align:left;font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.5px">Prazo</th>' +
+                '<th style="padding:12px 16px;text-align:left;font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.5px">Status</th>' +
+                '<th style="padding:12px 16px;text-align:center;font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.5px">Acoes</th>' +
+                '</tr></thead><tbody>';
+
+            var rows = '';
+            for (var i = 0; i < garantias.length; i++) {
+                var g = garantias[i];
+                var venc = calcVenc(g);
+                var vencStr = venc ? venc.toLocaleDateString('pt-BR') : '&mdash;';
+                var dias = getDias(g);
+                var status = getStatus(g);
+                var statusBadge = '<span style="color:#aaa">&mdash;</span>';
+                var rowBg = (i % 2 === 0) ? '#fff' : '#f9f9f9';
+                if (status === 'vencida') {
+                    statusBadge = '<span style="background:#f44336;color:#fff;padding:3px 10px;border-radius:10px;font-size:11px;font-weight:700">Vencida</span>';
+                    rowBg = '#fff5f5';
+                } else if (status === 'vence30') {
+                    statusBadge = '<span style="background:#FF9800;color:#fff;padding:3px 10px;border-radius:10px;font-size:11px;font-weight:700">' + dias + 'd restantes</span>';
+                    rowBg = '#fffaf0';
+                } else if (status === 'valida') {
+                    statusBadge = '<span style="background:#4CAF50;color:#fff;padding:3px 10px;border-radius:10px;font-size:11px;font-weight:700">Valida</span>';
+                }
+                var dataIns = g.data_instalacao ? new Date(g.data_instalacao + 'T00:00:00').toLocaleDateString('pt-BR') : '&mdash;';
+                rows += '<tr style="background:' + rowBg + ';border-bottom:1px solid #f0f0f0" ' +
+                    'onmouseover="this.style.background=\'#fff8f0\'" onmouseout="this.style.background=\'' + rowBg + '\'">' +
+                    '<td style="padding:11px 16px;font-weight:700;color:#1a1d2e;font-size:13px;cursor:pointer" onclick="detalheGarantiaTelaModal(\'' + g.id + '\')">' + getClienteNome(g.cliente_id) + '</td>' +
+                    '<td style="padding:11px 16px;font-size:12px;color:#555;cursor:pointer" onclick="detalheGarantiaTelaModal(\'' + g.id + '\')">&#128241; ' + (g.modelo||'&mdash;') + '</td>' +
+                    '<td style="padding:11px 16px;font-size:12px;color:#666;cursor:pointer" onclick="detalheGarantiaTelaModal(\'' + g.id + '\')">' + dataIns + '</td>' +
+                    '<td style="padding:11px 16px;font-size:12px;color:#666;cursor:pointer" onclick="detalheGarantiaTelaModal(\'' + g.id + '\')">' + vencStr + '</td>' +
+                    '<td style="padding:11px 16px;font-size:12px;color:#666;cursor:pointer" onclick="detalheGarantiaTelaModal(\'' + g.id + '\')">' + (g.prazo_dias||'&mdash;') + 'd</td>' +
+                    '<td style="padding:11px 16px;cursor:pointer" onclick="detalheGarantiaTelaModal(\'' + g.id + '\')">' + statusBadge + '</td>' +
+                    '<td style="padding:11px 16px;text-align:center">' +
+                    '<button onclick="editarGarantiaTela(\'' + g.id + '\')" style="background:#FF9800;color:#fff;border:none;border-radius:5px;padding:5px 12px;cursor:pointer;font-size:12px;font-weight:600">&#9998; Editar</button>' +
+                    '</td></tr>';
+            }
+
+            var tfooter = '</tbody></table><div style="padding:10px 16px;font-size:12px;color:#888;border-top:1px solid #f0f0f0;text-align:right">Exibindo ' + garantias.length + ' garantia' + (garantias.length !== 1 ? 's' : '') + '</div>';
+            grid.innerHTML = '<div style="background:#fff;border-radius:10px;box-shadow:0 1px 6px rgba(0,0,0,.08);overflow:hidden">' + thead + rows + tfooter + '</div>';
         }
 
         function detalheGarantiaTelaModal(id) {
@@ -3442,21 +3618,23 @@
                     <div style="text-align:right"><button type="button" class="btn btn-danger btn-small" onclick="this.closest('.model-row').remove()" style="font-size:11px">✕ Remover</button></div>`;
             } else {
                 row.innerHTML = `
-                    <div style="display:grid;grid-template-columns:2fr 1fr 1fr;gap:8px;align-items:end">
-                        <div>
+                    <div style="display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap">
+                        <div style="flex:1;min-width:140px">
                             <label style="font-size:11px;color:#666;display:block;margin-bottom:3px">Modelo</label>
                             <input type="text" placeholder="Ex: Samsung S24" class="modelo-input" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:4px;font-size:13px">
                         </div>
-                        <div>
+                        <div style="width:100px">
                             <label style="font-size:11px;color:#666;display:block;margin-bottom:3px">Têm em casa</label>
-                            <input type="number" class="tem-input" min="0" value="0" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:4px;font-size:13px">
+                            <input type="number" class="tem-input" min="0" value="0" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:4px;font-size:13px;text-align:center">
                         </div>
-                        <div>
+                        <div style="width:110px">
                             <label style="font-size:11px;color:#1976D2;display:block;margin-bottom:3px">Estão pedindo</label>
-                            <input type="number" class="pedem-input" min="0" value="0" style="width:100%;padding:8px;border:1px solid #90CAF9;border-radius:4px;font-size:13px">
+                            <input type="number" class="pedem-input" min="0" value="0" style="width:100%;padding:8px;border:1px solid #90CAF9;border-radius:4px;font-size:13px;text-align:center;background:#f0f7ff">
                         </div>
-                    </div>
-                    <div style="text-align:right;margin-top:6px"><button type="button" class="btn btn-danger btn-small" onclick="this.closest('.model-row').remove()" style="font-size:11px">✕ Remover</button></div>`;
+                        <div style="padding-bottom:2px">
+                            <button type="button" class="btn btn-danger btn-small" onclick="this.closest('.model-row').remove()" style="font-size:11px">✕</button>
+                        </div>
+                    </div>`;
             }
             container.appendChild(row);
         }
@@ -3727,14 +3905,54 @@
         // =====================================================================
         // CLIENTES (Supabase)
         // =====================================================================
+        // CEP helpers
+        function mascararCep(input) {
+            let v = input.value.replace(/\D/g,'').slice(0,8);
+            if (v.length > 5) v = v.slice(0,5) + '-' + v.slice(5);
+            input.value = v;
+        }
+
+        async function buscarCep(cep) {
+            const digits = cep.replace(/\D/g,'');
+            if (digits.length !== 8) return;
+            const spinner = _modalEl('cliente-cep-spinner');
+            if (spinner) spinner.style.display = 'inline';
+            try {
+                const resp = await fetch(`https://viacep.com.br/ws/${digits}/json/`);
+                const data = await resp.json();
+                if (!data.erro) {
+                    const set = (id, val) => { const el = _modalEl(id); if (el) el.value = val || ''; };
+                    set('cliente-endereco', data.logradouro);
+                    set('cliente-bairro',   data.bairro);
+                    set('cliente-cidade',   data.localidade);
+                    set('cliente-estado',   data.uf);
+                    // Focar no campo número após preencher
+                    setTimeout(() => { const n = _modalEl('cliente-numero'); if (n) n.focus(); }, 50);
+                } else {
+                    alert('CEP não encontrado. Preencha o endereço manualmente.');
+                }
+            } catch(e) {
+                alert('Erro ao buscar CEP. Verifique sua conexão.');
+            } finally {
+                if (spinner) spinner.style.display = 'none';
+            }
+        }
+
         async function salvarCliente(event) {
             event.preventDefault();
             const editId = (_modalEl('cliente-edit-id')||{}).value || '';
             const payload = {
-                nome:      (_modalEl('cliente-nome')||{value:''}).value.trim(),
-                whatsapp:  (_modalEl('cliente-whatsapp')||{value:''}).value.trim(),
-                email:     (_modalEl('cliente-email')||{value:''}).value.trim(),
-                cpf:       (_modalEl('cliente-cpf')||{value:''}).value.trim(),
+                nome:         (_modalEl('cliente-nome')||{value:''}).value.trim(),
+                whatsapp:     (_modalEl('cliente-whatsapp')||{value:''}).value.trim(),
+                email:        (_modalEl('cliente-email')||{value:''}).value.trim(),
+                cpf:          (_modalEl('cliente-cpf')||{value:''}).value.trim(),
+                cep:          (_modalEl('cliente-cep')||{value:''}).value.trim(),
+                endereco:     (_modalEl('cliente-endereco')||{value:''}).value.trim(),
+                numero:       (_modalEl('cliente-numero')||{value:''}).value.trim(),
+                complemento:  (_modalEl('cliente-complemento')||{value:''}).value.trim(),
+                bairro:       (_modalEl('cliente-bairro')||{value:''}).value.trim(),
+                cidade:       (_modalEl('cliente-cidade')||{value:''}).value.trim(),
+                estado:       (_modalEl('cliente-estado')||{value:''}).value.trim().toUpperCase(),
             };
             let error;
             if (editId) {
@@ -3752,47 +3970,88 @@
             const grid = document.getElementById('clientes-grid');
             if (!grid) return;
             if (clientesCache.length === 0) await carregarClientesCache();
-            const q = (document.getElementById('clientes-search')?.value || '').toLowerCase();
-            const lista = q ? clientesCache.filter(c =>
+
+            const q = (document.getElementById('clientes-search')?.value || '').trim().toLowerCase();
+            const ordem = document.getElementById('clientes-ordem')?.value || 'nome';
+
+            let lista = q ? clientesCache.filter(c =>
                 (c.nome||'').toLowerCase().includes(q) ||
                 (c.email||'').toLowerCase().includes(q) ||
-                (c.whatsapp||'').includes(q) ||
-                (c.cpf||'').includes(q)
-            ) : clientesCache;
+                (c.whatsapp||'').replace(/\D/g,'').includes(q.replace(/\D/g,'')) ||
+                (c.cpf||'').replace(/\D/g,'').includes(q.replace(/\D/g,''))
+            ) : [...clientesCache];
+
+            // Ordenação
+            if (ordem === 'nome') lista.sort((a,b) => (a.nome||'').localeCompare(b.nome||'', 'pt-BR'));
+            else if (ordem === 'nome-desc') lista.sort((a,b) => (b.nome||'').localeCompare(a.nome||'', 'pt-BR'));
+
+            // Barra de contagem
+            const statBar = document.getElementById('clientes-stat-bar');
+            if (statBar) {
+                statBar.innerHTML = `
+                    <span style="background:#1a1d2e;color:#fff;padding:4px 14px;border-radius:20px;font-weight:700;font-size:12px">
+                        Total: ${clientesCache.length}
+                    </span>
+                    ${q ? `<span style="background:#FF9800;color:#fff;padding:4px 14px;border-radius:20px;font-size:12px;font-weight:600">
+                        🔍 ${lista.length} resultado${lista.length !== 1 ? 's' : ''} encontrado${lista.length !== 1 ? 's' : ''}
+                    </span>` : ''}`;
+            }
 
             if (lista.length === 0) {
-                grid.innerHTML = '<div class="empty-state">👥 Nenhum cliente encontrado</div>';
+                grid.innerHTML = '<div class="empty-state" style="padding:40px;text-align:center;color:#999;background:#fff;border-radius:8px">👥 Nenhum cliente encontrado</div>';
                 return;
             }
+
             grid.innerHTML = `
-                <table style="width:100%;border-collapse:collapse;font-size:13px;background:#fff;border-radius:8px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.07)">
-                    <thead>
-                        <tr style="background:#1a1d2e;color:#fff">
-                            <th style="padding:10px 14px;text-align:left;font-weight:600">Nome</th>
-                            <th style="padding:10px 14px;text-align:left;font-weight:600">WhatsApp</th>
-                            <th style="padding:10px 14px;text-align:left;font-weight:600">CPF</th>
-                            <th style="padding:10px 14px;text-align:left;font-weight:600">E-mail</th>
-                            <th style="padding:10px 14px;text-align:center;font-weight:600">Ações</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${lista.map((c, i) => `
-                            <tr style="background:${i%2===0?'#fff':'#fafafa'};border-bottom:1px solid #f0f0f0;transition:background .15s" onmouseover="this.style.background='#fff8ee'" onmouseout="this.style.background='${i%2===0?'#fff':'#fafafa'}'">
-                                <td style="padding:10px 14px;font-weight:600;color:#1a1d2e">${c.nome}</td>
-                                <td style="padding:10px 14px">
-                                    ${c.whatsapp ? `<a href="https://wa.me/55${(c.whatsapp||'').replace(/\D/g,'')}" target="_blank" style="color:#25D366;font-weight:600;text-decoration:none">📱 ${c.whatsapp}</a>` : '<span style="color:#bbb">—</span>'}
-                                </td>
-                                <td style="padding:10px 14px;color:#555">${c.cpf || '<span style="color:#bbb">—</span>'}</td>
-                                <td style="padding:10px 14px;color:#555">${c.email || '<span style="color:#bbb">—</span>'}</td>
-                                <td style="padding:10px 14px;text-align:center">
-                                    <button onclick="editarCliente('${c.id}')" title="Editar"
-                                        style="background:#1a1d2e;color:#fff;border:none;border-radius:5px;padding:4px 10px;cursor:pointer;font-size:12px;margin-right:4px">✏️</button>
-                                    <button onclick="deletarClienteById('${c.id}')"
-                                        style="background:#f44336;color:#fff;border:none;border-radius:5px;padding:4px 10px;cursor:pointer;font-size:12px">🗑️</button>
-                                </td>
-                            </tr>`).join('')}
-                    </tbody>
-                </table>`;
+                <div style="background:#fff;border-radius:10px;box-shadow:0 1px 6px rgba(0,0,0,.08);overflow:hidden">
+                    <table style="width:100%;border-collapse:collapse;font-size:13px">
+                        <thead>
+                            <tr style="background:#FF9800;color:#fff">
+                                <th style="padding:12px 16px;text-align:left;font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.5px">Nome</th>
+                                <th style="padding:12px 16px;text-align:left;font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.5px">WhatsApp</th>
+                                <th style="padding:12px 16px;text-align:left;font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.5px">CPF</th>
+                                <th style="padding:12px 16px;text-align:left;font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.5px">Endereço</th>
+                                <th style="padding:12px 16px;text-align:center;font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.5px">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${lista.map((c, i) => {
+                                const endParts = [c.endereco, c.numero, c.complemento].filter(Boolean).join(', ');
+                                const cidadeUF = [c.cidade, c.estado].filter(Boolean).join('/');
+                                const endCompleto = [endParts, c.bairro, cidadeUF, c.cep].filter(Boolean).join(' — ');
+                                return `
+                                <tr style="border-bottom:1px solid #f0f0f0;background:${i%2===0?'#fff':'#f9f9f9'};transition:background .1s"
+                                    onmouseover="this.style.background='#fff8f0'" onmouseout="this.style.background='${i%2===0?'#fff':'#f9f9f9'}'">
+                                    <td style="padding:11px 16px;font-weight:700;color:#1a1d2e;font-size:13px">
+                                        ${c.nome||'—'}
+                                        ${c.email ? `<div style="font-size:11px;color:#888;font-weight:400;margin-top:2px">${c.email}</div>` : ''}
+                                    </td>
+                                    <td style="padding:11px 16px">
+                                        ${c.whatsapp
+                                            ? `<a href="https://wa.me/55${(c.whatsapp||'').replace(/\D/g,'')}" target="_blank"
+                                                style="color:#1a8c45;font-weight:600;text-decoration:none;display:flex;align-items:center;gap:5px">
+                                                <span style="background:#25D366;color:#fff;border-radius:50%;width:20px;height:20px;display:inline-flex;align-items:center;justify-content:center;font-size:11px">📱</span>
+                                                ${c.whatsapp}</a>`
+                                            : '<span style="color:#ccc">—</span>'}
+                                    </td>
+                                    <td style="padding:11px 16px;color:#444;font-family:monospace;font-size:12px">${c.cpf||'<span style="color:#ccc">—</span>'}</td>
+                                    <td style="padding:11px 16px;color:#555;font-size:12px;max-width:220px">
+                                        ${endCompleto || '<span style="color:#ccc">—</span>'}
+                                    </td>
+                                    <td style="padding:11px 16px;text-align:center;white-space:nowrap">
+                                        <button onclick="editarCliente('${c.id}')" title="Editar"
+                                            style="background:#1a1d2e;color:#fff;border:none;border-radius:5px;padding:5px 12px;cursor:pointer;font-size:12px;font-weight:600;margin-right:4px">✏️ Editar</button>
+                                        <button onclick="deletarClienteById('${c.id}')" title="Excluir"
+                                            style="background:#f44336;color:#fff;border:none;border-radius:5px;padding:5px 12px;cursor:pointer;font-size:12px;font-weight:600">🗑️</button>
+                                    </td>
+                                </tr>`;
+                            }).join('')}
+                        </tbody>
+                    </table>
+                    <div style="padding:10px 16px;background:#f8f9fa;border-top:1px solid #eee;font-size:12px;color:#888;text-align:right">
+                        Exibindo ${lista.length} de ${clientesCache.length} clientes
+                    </div>
+                </div>`;
         }
 
         function editarCliente(id) {
@@ -3800,12 +4059,21 @@
             if (!c) return;
             openModal('novo-cliente-form');
             setTimeout(() => {
+                const set = (elId, val) => { const el = _modalEl(elId); if (el) el.value = val || ''; };
+                set('cliente-form-titulo', ''); // handled below
                 const t = _modalEl('cliente-form-titulo'); if (t) t.textContent = 'Editar Cliente';
-                const e = _modalEl('cliente-edit-id');     if (e) e.value = id;
-                const n = _modalEl('cliente-nome');        if (n) n.value = c.nome || '';
-                const w = _modalEl('cliente-whatsapp');    if (w) w.value = c.whatsapp || '';
-                const em= _modalEl('cliente-email');       if (em) em.value = c.email || '';
-                const cp= _modalEl('cliente-cpf');         if (cp) cp.value = c.cpf || '';
+                set('cliente-edit-id',    id);
+                set('cliente-nome',       c.nome);
+                set('cliente-whatsapp',   c.whatsapp);
+                set('cliente-email',      c.email);
+                set('cliente-cpf',        c.cpf);
+                set('cliente-cep',        c.cep);
+                set('cliente-endereco',   c.endereco);
+                set('cliente-numero',     c.numero);
+                set('cliente-complemento',c.complemento);
+                set('cliente-bairro',     c.bairro);
+                set('cliente-cidade',     c.cidade);
+                set('cliente-estado',     c.estado);
             }, 10);
         }
 
@@ -3825,6 +4093,12 @@
             const editId = (_modalEl('loja-edit-id')||{}).value || '';
             const emailLogin = ((_modalEl('loja-email-login')||{value:''}).value||'').trim().toLowerCase();
             const senhaLogin = ((_modalEl('loja-senha-login')||{value:''}).value||'').trim();
+
+            // Validações de acesso
+            if (!emailLogin) { alert('O e-mail de acesso é obrigatório.'); return; }
+            if (!editId && !senhaLogin) { alert('A senha é obrigatória para criar uma nova loja.'); return; }
+            if (senhaLogin && senhaLogin.length < 6) { alert('A senha deve ter no mínimo 6 caracteres.'); return; }
+
             const payload = {
                 nome_fantasia: (_modalEl('loja-nome-fantasia')||{value:''}).value.trim(),
                 razao_social:  (_modalEl('loja-razao-social')||{value:''}).value.trim(),
@@ -3833,19 +4107,26 @@
                 endereco:      (_modalEl('loja-endereco')||{value:''}).value.trim(),
                 cidade:        (_modalEl('loja-cidade')||{value:''}).value.trim(),
                 estado:        (_modalEl('loja-estado')||{value:''}).value.trim().toUpperCase(),
+                email:         emailLogin,
             };
-            if (emailLogin) payload.email = emailLogin;
             if (senhaLogin) {
-                if (senhaLogin.length < 6) { alert('A senha deve ter no mínimo 6 caracteres.'); return; }
                 payload.senha = await sha256(senhaLogin);
             }
+
             let error;
             if (editId) {
                 ({ error } = await _sb.from('lojas').update(payload).eq('id', editId));
             } else {
                 ({ error } = await _sb.from('lojas').insert([payload]));
             }
-            if (error) { alert('Erro ao salvar loja: ' + error.message); return; }
+            if (error) {
+                if (error.message && error.message.includes('duplicate key')) {
+                    alert('Este e-mail já está cadastrado em outra loja. Use um e-mail diferente.');
+                } else {
+                    alert('Erro ao salvar loja: ' + error.message);
+                }
+                return;
+            }
             _fecharModal();
             await carregarLojasCache();
             renderLojas();
@@ -3900,7 +4181,11 @@
                 const ci= _modalEl('loja-cidade');         if (ci) ci.value = l.cidade || '';
                 const es= _modalEl('loja-estado');         if (es) es.value = l.estado || '';
                 const em= _modalEl('loja-email-login');    if (em) em.value = l.email || '';
-                // senha left blank intentionally (never show existing hash)
+                // Senha: opcional ao editar — muda label para indicar isso
+                const sl= _modalEl('loja-senha-label');
+                if (sl) sl.textContent = 'Nova Senha (deixe em branco para manter)';
+                const sp= _modalEl('loja-senha-login');
+                if (sp) sp.placeholder = 'Deixe em branco para não alterar';
             }, 10);
         }
 
@@ -4117,6 +4402,7 @@
             if (capa && capa.stage !== stage) {
                 const oldSt = CAPA_STAGES.find(s => s.id === capa.stage);
                 const newSt = CAPA_STAGES.find(s => s.id === stage);
+                if (!confirm(`Mover este pedido para "${newSt?.label || stage}"?`)) return;
                 if (!capa.log) capa.log = [];
                 capa.log.unshift({ msg: `▶ ${oldSt?.label||capa.stage} → ${newSt?.label||stage}`, loja: getLojaNome(capa.loja_id), color: newSt?.color||'#FF9800', ts: ts() });
                 capa.stage = stage;
@@ -4127,30 +4413,34 @@
 
         function dropLote(event, stage) {
             event.preventDefault();
-            event.target.closest('.kanban-cards').classList.remove('drag-over');
+            event.target.closest('.kanban-cards')?.classList.remove('drag-over');
             const id = event.dataTransfer.getData('lote-id');
-
             let lotes = loadStorage('cbcrm_producao_loja');
             const lote = lotes.find(l => l.id === id);
-            if (lote) {
-                lote.stage = stage;
-                saveStorage('cbcrm_producao_loja', lotes);
-                renderProducaoLoja();
-            }
+            if (!lote || lote.stage === stage) return;
+            const novoLabel = LOTE_STAGES.find(s => s.id === stage)?.label || stage;
+            if (!confirm(`Mover este pedido para "${novoLabel}"?`)) return;
+            if (!lote.log) lote.log = [];
+            lote.log.push({ msg: `🔄 Movido para: ${novoLabel}`, ts: ts() });
+            lote.stage = stage;
+            saveStorage('cbcrm_producao_loja', lotes);
+            renderProducaoLoja();
         }
 
         function dropGarantia(event, stage) {
             event.preventDefault();
-            event.target.closest('.kanban-cards').classList.remove('drag-over');
+            event.target.closest('.kanban-cards')?.classList.remove('drag-over');
             const id = event.dataTransfer.getData('garantia-id');
-
             let garantias = loadStorage('cbcrm_garantia_produto');
             const garantia = garantias.find(g => g.id === id);
-            if (garantia) {
-                garantia.stage = stage;
-                saveStorage('cbcrm_garantia_produto', garantias);
-                renderGarantiaProduto();
-            }
+            if (!garantia || garantia.stage === stage) return;
+            const novoLabel = GP_STAGES.find(s => s.id === stage)?.label || stage;
+            if (!confirm(`Mover esta garantia para "${novoLabel}"?`)) return;
+            if (!garantia.log) garantia.log = [];
+            garantia.log.push({ msg: `🔄 Movido para: ${novoLabel}`, ts: ts() });
+            garantia.stage = stage;
+            saveStorage('cbcrm_garantia_produto', garantias);
+            renderGarantiaProduto();
         }
 
         // PRINT
